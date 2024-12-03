@@ -1,0 +1,225 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.8 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.8" pages="2">
+  <diagram name="功能建模" id="NBFd98P7RPhy97YwyTXO">
+    <mxGraphModel dx="712" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-2" value="修改密码" style="swimlane;html=1;childLayout=stackLayout;startSize=20;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
+          <mxGeometry x="40" y="20" width="511.76" height="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-3" value="用户" style="swimlane;html=1;startSize=20;" parent="SNAdd0FfvzcMFL1DqeOO-2" vertex="1">
+          <mxGeometry y="20" width="300" height="1090" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-3" source="SNAdd0FfvzcMFL1DqeOO-5" target="2tArkiWJwWo2Jq1T2G34-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-5" value="登录完成后，选择修改密码功能" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+          <mxGeometry x="22.25" y="140" width="141.25" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-120" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-3" source="SNAdd0FfvzcMFL1DqeOO-16" target="SNAdd0FfvzcMFL1DqeOO-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-16" value="" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fillColor=#000000;fontFamily=Verdana;fontSize=12;align=center;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+          <mxGeometry x="72.87" y="40" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-3" source="SNAdd0FfvzcMFL1DqeOO-121" target="2tArkiWJwWo2Jq1T2G34-7" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="540" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-121" value="用户输入新密码并确认" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+          <mxGeometry x="50.004999999999995" y="465" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-137" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+          <mxGeometry x="235" y="370" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-7" value="系统" style="swimlane;html=1;startSize=20;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+          <mxGeometry x="300.01" width="211.75" height="1090" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-134" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="SNAdd0FfvzcMFL1DqeOO-123" target="SNAdd0FfvzcMFL1DqeOO-133" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-123" value="验证密码是否正确" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="46.129999999999995" y="265" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-141" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="SNAdd0FfvzcMFL1DqeOO-133" target="SNAdd0FfvzcMFL1DqeOO-140" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-133" value="" style="rhombus;whiteSpace=wrap;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="66.13" y="370" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-140" value="提示用户输入新密码并确认新密码" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="45.879999999999995" y="465" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="SNAdd0FfvzcMFL1DqeOO-148" target="2tArkiWJwWo2Jq1T2G34-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="85.88000000000001" y="910" as="sourcePoint" />
+            <mxPoint x="89.99000000000001" y="950" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-149" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="SNAdd0FfvzcMFL1DqeOO-143" target="SNAdd0FfvzcMFL1DqeOO-148" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="SNAdd0FfvzcMFL1DqeOO-143" target="2tArkiWJwWo2Jq1T2G34-2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-100.00999999999999" y="160" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-80" y="700" />
+              <mxPoint x="-80" y="165" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-143" value="" style="rhombus;whiteSpace=wrap;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="65.88" y="680" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-142" value="Y" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="79.995" y="428" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-147" value="Y" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="99.745" y="750" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-148" value="更新密码" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="45.88" y="800" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="2tArkiWJwWo2Jq1T2G34-2" target="SNAdd0FfvzcMFL1DqeOO-123" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-2" value="系统提示用户输入当前密码" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="45.875" y="135" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-135" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="SNAdd0FfvzcMFL1DqeOO-133" target="2tArkiWJwWo2Jq1T2G34-2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-60.00999999999999" y="170" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-59.00999999999999" y="390" />
+              <mxPoint x="-59.00999999999999" y="165" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-7" source="2tArkiWJwWo2Jq1T2G34-7" target="SNAdd0FfvzcMFL1DqeOO-143" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-7" value="系统验证两次输入的密码是否一致" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="46.125" y="560" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-33" value="用户返回个人中心" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-7" vertex="1">
+          <mxGeometry x="45.879999999999995" y="920" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SNAdd0FfvzcMFL1DqeOO-146" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+          <mxGeometry x="220" y="670" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-3" source="SNAdd0FfvzcMFL1DqeOO-140" target="SNAdd0FfvzcMFL1DqeOO-121" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-32" value="" style="shape=mxgraph.bpmn.shape;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;perimeter=ellipsePerimeter;outline=end;symbol=terminate;rounded=0;shadow=0;comic=0;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
+          <mxGeometry x="425.89" y="1080" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2tArkiWJwWo2Jq1T2G34-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="2tArkiWJwWo2Jq1T2G34-33" target="2tArkiWJwWo2Jq1T2G34-32" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="jpp94Eph6kHTiTMXWwHy" name="行为建模">
+    <mxGraphModel dx="1295" dy="322" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-1" value="" style="ellipse;fillColor=strokeColor;" parent="1" vertex="1">
+          <mxGeometry x="120" y="1590" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-2" value="用户登录并选择“修改密码”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="190" y="1580" width="208" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JIKJKLc1fwiQa-4SMvxM-3" target="AnhCv7x39EKfxkDHstR0-7">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="1597" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-3" value="输入当前密码" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="437" y="1580" width="172" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="AnhCv7x39EKfxkDHstR0-7" target="JIKJKLc1fwiQa-4SMvxM-12">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="739.5" y="1614" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JIKJKLc1fwiQa-4SMvxM-6" target="AnhCv7x39EKfxkDHstR0-10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1110" y="1597" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-6" value="输入新密码并确认" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="840" y="1580" width="148" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JIKJKLc1fwiQa-4SMvxM-9" target="JIKJKLc1fwiQa-4SMvxM-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-9" value="更新密码" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="1300" y="1580" width="113" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JIKJKLc1fwiQa-4SMvxM-10" target="JIKJKLc1fwiQa-4SMvxM-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-10" value="显示“密码修改成功”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="1490" y="1580" width="98" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-12" value="提示“当前密码错误”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="670.5" y="1719" width="89" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-14" value="提示“密码不一致“" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="1012.5" y="1700" width="185" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-15" value="" style="ellipse;shape=endState;fillColor=strokeColor;" parent="1" vertex="1">
+          <mxGeometry x="1660" y="1590" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-16" value="" style="curved=1;startArrow=none;;rounded=0;" parent="1" source="JIKJKLc1fwiQa-4SMvxM-1" target="JIKJKLc1fwiQa-4SMvxM-2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="137" y="1587" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JIKJKLc1fwiQa-4SMvxM-17" value="" style="curved=1;startArrow=none;;rounded=0;" parent="1" source="JIKJKLc1fwiQa-4SMvxM-2" target="JIKJKLc1fwiQa-4SMvxM-3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="421" y="1687" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-4" value="" style="curved=1;startArrow=none;;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="JIKJKLc1fwiQa-4SMvxM-1" target="JIKJKLc1fwiQa-4SMvxM-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="137" y="1587" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="AnhCv7x39EKfxkDHstR0-7" target="JIKJKLc1fwiQa-4SMvxM-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-7" value="验证当前密码" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="1572" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="AnhCv7x39EKfxkDHstR0-10" target="JIKJKLc1fwiQa-4SMvxM-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-14" value="新密码有效" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="AnhCv7x39EKfxkDHstR0-13">
+          <mxGeometry x="-0.2414" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="AnhCv7x39EKfxkDHstR0-10" target="JIKJKLc1fwiQa-4SMvxM-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-16" value="新密码无效" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="AnhCv7x39EKfxkDHstR0-15">
+          <mxGeometry x="0.028" y="3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-10" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;验证新密码一致性&lt;/span&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="1577" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="AnhCv7x39EKfxkDHstR0-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.541;entryY=0.957;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="JIKJKLc1fwiQa-4SMvxM-14" target="JIKJKLc1fwiQa-4SMvxM-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
