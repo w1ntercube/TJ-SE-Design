@@ -5,7 +5,7 @@ CREATE TABLE USER (
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     creditScore INT DEFAULT 100,
-    role VARCHAR(50) DEFAULT 'customer',
+    role VARCHAR(50) DEFAULT 'buyer',
     registrationDate DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE CATEGORY (
@@ -49,8 +49,20 @@ CREATE TABLE PAYMENT (
     orderID INT NOT NULL, 
     paymentMethod VARCHAR(255) NOT NULL, 
     paymentDate DATETIME DEFAULT CURRENT_TIMESTAMP, 
-    paymentStatus VARCHAR(50) DEFAULT 'completed',    paymentAmount FLOAT NOT NULL, 
-    FOREIGN KEY (orderID) REFERENCES ORDER(orderID)
+    paymentStatus VARCHAR(50) DEFAULT 'completed',    paymentAmount FLOAT NOT NULL,     FOREIGN KEY (orderID) REFERENCES ORDER(orderID)
+);
+CREATE TABLE RENTAL (
+    rentalID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    renterID INT NOT NULL,
+    ownerID INT NOT NULL,
+    instrumentID INT NOT NULL,
+    rentalStartDate DATETIME NOT NULL,
+    rentalEndDate DATETIME NOT NULL,
+    deposit FLOAT NOT NULL,
+    rentalStatus VARCHAR(50) DEFAULT 'ongoing',
+    FOREIGN KEY (renterID) REFERENCES USER(userID),
+    FOREIGN KEY (ownerID) REFERENCES USER(userID),
+    FOREIGN KEY (instrumentID) REFERENCES INSTRUMENT(instrumentID)
 );
 CREATE TABLE FAVORITE (
     favoriteID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -69,7 +81,6 @@ CREATE TABLE REVIEW (
     reviewDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) DEFAULT 'pending',
     FOREIGN KEY (userID) REFERENCES USER(userID),
-    FOREIGN KEY (orderID) REFERENCES ORDER(orderID),
     FOREIGN KEY (instrumentID) REFERENCES INSTRUMENT(instrumentID)
 );
 CREATE TABLE ADMIN_LOG (
