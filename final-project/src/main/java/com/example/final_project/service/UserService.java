@@ -40,9 +40,30 @@ public class UserService {
         }).orElseThrow(() -> new RuntimeException("用户未找到"));
     }
 
+    // 更新用户信息，根据用户名
+    public User updateUserByUsername(String username, User updatedUser) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        // 更新用户信息
+        user.setUsername(updatedUser.getUsername());
+        user.setPassword(updatedUser.getPassword());
+        user.setPhone(updatedUser.getPhone());
+        user.setAvatarUrl(updatedUser.getAvatarUrl());
+        user.setReputationScore(updatedUser.getReputationScore());
+        user.setIsBanned(updatedUser.getIsBanned());
+        return userRepository.save(user);  // 保存更新后的用户
+    }
+
     // 删除用户
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    //查询指定名字用户
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }
 
