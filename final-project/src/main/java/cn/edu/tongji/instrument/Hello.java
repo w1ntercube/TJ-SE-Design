@@ -1,4 +1,4 @@
-package com.example.final_project;
+package cn.edu.tongji.instrument;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

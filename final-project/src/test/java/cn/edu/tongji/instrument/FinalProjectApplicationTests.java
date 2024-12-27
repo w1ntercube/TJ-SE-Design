@@ -1,4 +1,4 @@
-package com.example.final_project;
+package cn.edu.tongji.instrument;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

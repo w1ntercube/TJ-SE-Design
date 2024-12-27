@@ -1,4 +1,4 @@
-package com.example.final_project.util;
+package cn.edu.tongji.instrument.util;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;

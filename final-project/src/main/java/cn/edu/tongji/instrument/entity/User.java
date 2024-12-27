@@ -1,4 +1,4 @@
-package com.example.final_project.entity;
+package cn.edu.tongji.instrument.entity;
 
 import jakarta.persistence.*;
 

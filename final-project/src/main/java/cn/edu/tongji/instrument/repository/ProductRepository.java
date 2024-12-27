@@ -1,7 +1,7 @@
-package com.example.final_project.repository;
+package cn.edu.tongji.instrument.repository;
 
-import com.example.final_project.entity.Product;
-import com.example.final_project.entity.User;
+import cn.edu.tongji.instrument.entity.Product;
+import cn.edu.tongji.instrument.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

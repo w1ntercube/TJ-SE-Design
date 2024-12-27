@@ -1,6 +1,6 @@
-package com.example.final_project.service;
-import com.example.final_project.entity.User;
-import com.example.final_project.repository.UserRepository;
+package cn.edu.tongji.instrument.service;
+import cn.edu.tongji.instrument.entity.User;
+import cn.edu.tongji.instrument.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

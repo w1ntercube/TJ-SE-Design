@@ -1,10 +1,10 @@
-package com.example.final_project.controller;
+package cn.edu.tongji.instrument.controller;
 
-import com.example.final_project.entity.Product;
-import com.example.final_project.entity.User;
-import com.example.final_project.service.UserService;
-import com.example.final_project.service.ProductService;
-import com.example.final_project.util.FileUploadUtil;
+import cn.edu.tongji.instrument.entity.Product;
+import cn.edu.tongji.instrument.entity.User;
+import cn.edu.tongji.instrument.service.UserService;
+import cn.edu.tongji.instrument.service.ProductService;
+import cn.edu.tongji.instrument.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,4 @@
-package com.example.final_project.config;
+package cn.edu.tongji.instrument.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

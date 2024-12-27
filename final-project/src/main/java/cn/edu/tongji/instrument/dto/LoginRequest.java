@@ -1,4 +1,4 @@
-package com.example.final_project.dto;
+package cn.edu.tongji.instrument.dto;
 
 public class LoginRequest {
     private String username;

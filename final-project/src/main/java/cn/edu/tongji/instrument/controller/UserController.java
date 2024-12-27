@@ -1,10 +1,10 @@
-package com.example.final_project.controller;
+package cn.edu.tongji.instrument.controller;
 
-import com.example.final_project.dto.ChangePasswordRequest;
-import com.example.final_project.dto.LoginRequest;
-import com.example.final_project.entity.User;
-import com.example.final_project.service.UserService;
-import com.example.final_project.util.FileUploadUtil;
+import cn.edu.tongji.instrument.dto.ChangePasswordRequest;
+import cn.edu.tongji.instrument.dto.LoginRequest;
+import cn.edu.tongji.instrument.entity.User;
+import cn.edu.tongji.instrument.service.UserService;
+import cn.edu.tongji.instrument.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
