@@ -61,4 +61,25 @@ public class OrderController {
     public ResponseEntity<Order> updateOrderStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
+
+    // 查询指定用户的订单
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orders);
+    }
+
+    // 根据用户订单类型和状态筛选订单
+    @GetMapping("/filter")
+    public ResponseEntity<List<Order>> getOrdersByUserAndFilters(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String orderType,
+            @RequestParam(required = false) OrderStatus orderStatus
+    ) {
+        List<Order> orders = orderService.getOrdersByUserAndFilters(userId, orderType, orderStatus);
+        return ResponseEntity.ok(orders);
+    }
+
+
+
 }
