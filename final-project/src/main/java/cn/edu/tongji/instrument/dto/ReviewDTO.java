@@ -13,13 +13,15 @@ public class ReviewDTO {
     private int rating;
     private String comment;
     private String createdAt;
+
     private String username;
+    private String avatarUrl;
 
     // 定义日期格式化器
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     // 构造函数：从 Review 实体中提取数据
-    public ReviewDTO(Review review, String username) {
+    public ReviewDTO(Review review, String username, String avatarUrl) {
         this.id = review.getId();
         this.userId = review.getUserId();
         this.productId = review.getProductId();
@@ -27,7 +29,17 @@ public class ReviewDTO {
         this.comment = review.getComment();
         this.createdAt = review.getCreatedAt() != null ? review.getCreatedAt().format(formatter) : null;
         this.username = username;
+        this.avatarUrl = avatarUrl;
     }
+    public ReviewDTO(Review review) {
+        this.id = review.getId();
+        this.userId = review.getUserId();
+        this.productId = review.getProductId();
+        this.rating = review.getRating();
+        this.comment = review.getComment();
+        this.createdAt = review.getCreatedAt().toString();
+    }
+    public ReviewDTO() {}
 
     // Getters 和 Setters
     public Long getId() {
@@ -80,5 +92,11 @@ public class ReviewDTO {
     }
     public void setUsername(String username) {
         this.username = username;
+    }
+    public String getavatarUrl() {
+        return avatarUrl;
+    }
+    public void setavatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

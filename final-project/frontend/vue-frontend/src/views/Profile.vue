@@ -26,13 +26,33 @@
       </div>
     </div>
 
-      <div v-if="activeTab === 'favorites'">
-        <h2>我的收藏</h2>
-        <p>这里是我的收藏的内容。</p>
+    <div v-if="activeTab === 'favorites'">
+      <h2>我的收藏</h2>
+      <div v-if="favoriteProducts.length > 0" class="product-list">
+        <div
+          v-for="product in favoriteProducts"
+          :key="product.id"
+          class="product-item"
+          @click="goToProductPage(product.id)"
+        >
+          <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p>价格：￥{{ product.price }}</p>
+            <p>库存：{{ product.stock }}</p>
+          </div>
+          <button @click.stop="removeFromFavorites(product.id)" class="remove-button">移除收藏</button>
+        </div>
       </div>
+      <div v-else>
+        <p>您还没有收藏任何商品。</p>
+      </div>
+    </div>
 
-      <div v-if="activeTab === 'products'">
-        <div class="product-list">
+
+    <div v-if="activeTab === 'products'">
+      <h2>我的商品</h2>
+        <div v-if="products.length > 0" class="product-list">
           <div v-for="product in products" :key="product.id" class="product-item" @click="goToProductPage(product.id)">
             <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
             <div class="product-info">
@@ -43,7 +63,10 @@
             <button @click.stop="removeProduct(product.id)" class="remove-button">下架</button>
           </div>
         </div>
+      <div v-else>
+        <p>您还没有上架任何商品。</p>
       </div>
+    </div>
 
       <div v-if="activeTab === 'orders'">
         <h2>我的订单</h2>
@@ -96,6 +119,7 @@ export default {
 
       activeTab: "profile", // 默认选中"个人中心"选项卡
       products: [], // 初始化为空数组，动态加载商品数据
+      favoriteProducts: [], // 存储用户收藏的商品列表
       newProduct: {
         name: "",
         price: 0,
@@ -110,8 +134,41 @@ export default {
       this.activeTab = tab;
       if (tab === "products") {
         this.fetchProducts(); // 点击"我的商品"时获取商品数据
+      } else if (tab === "favorites") {
+        this.fetchFavorites(); // 点击"我的收藏"时获取收藏商品数据
       }
     },
+    // 获取收藏商品数据
+    async fetchFavorites() {
+      try {
+        const response = await axios.get(`/api/carts/${this.user.id}`);
+        if (response.status === 200) {
+          this.favoriteProducts = response.data; 
+        } else {
+          alert("获取收藏列表失败");
+        }
+      } catch (error) {
+        console.error("获取收藏列表时出错", error);
+        alert("获取收藏列表时出错，请稍后再试");
+      }
+    },
+
+    // 移除收藏
+    async removeFromFavorites(productId) {
+      try {
+        const response = await axios.delete(`/api/carts/${this.user.id}/${productId}`);
+        if (response.status === 200) {
+          this.favoriteProducts = this.favoriteProducts.filter(product => product.id !== productId);
+          alert("已移除收藏");
+        } else {
+          alert("移除收藏失败");
+        }
+      } catch (error) {
+        console.error("移除收藏时出错", error);
+        alert("移除收藏失败，请稍后再试");
+      }
+    },
+
 
     // 拼接路径
     getProductImageUrl(imagePath) {

@@ -23,4 +23,17 @@ public class ReviewController {
         }
         return ResponseEntity.ok(reviews); // 返回 ReviewDTO 列表
     }
+    @PostMapping
+    public ResponseEntity<ReviewDTO> addReview(@RequestBody ReviewDTO reviewDTO) {
+        // 校验数据
+        if (reviewDTO.getComment() == null || reviewDTO.getComment().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // 调用服务层保存评论
+        ReviewDTO savedReview = reviewService.addReview(reviewDTO);
+
+        // 返回保存成功的评论数据
+        return ResponseEntity.ok(savedReview);
+    }
 }
