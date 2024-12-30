@@ -23,7 +23,7 @@ public class PaymentController {
     private String secretKey;
 
     // 提交支付请求
-    @PostMapping("/pay")
+    @PostMapping("/api/pay")
     public String createOrder(
             @RequestParam("type") int type, // 支付方式: 微信1/支付宝2
             @RequestParam("price") BigDecimal price, // 订单金额
