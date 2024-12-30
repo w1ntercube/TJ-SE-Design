@@ -164,7 +164,6 @@
         // 直接跳转到首页
         // this.$router.push({ name: 'ToHome' });
       },
-      
       handleLike() {
         const storedUser = JSON.parse(localStorage.getItem("user"));
 
@@ -240,8 +239,54 @@
             console.error("评论提交失败:", error);
             alert("评论提交失败，请稍后重试！");
           });
-      },
+        },
+      async handleBuy() { 
+        try {
+          // 请求参数
+          const payload = new URLSearchParams();
+          payload.append("userId", this.userId); // 当前用户 ID
+          payload.append("productId", this.product.id); // 商品 ID
+          payload.append("quantity", 1); // 默认购买数量为 1
+          payload.append("type", 1); // 假设支付方式为支付宝（2）。微信可改为 1
+          payload.append("price", this.product.price); // 商品价格
+
+
+          // 向后端发送请求
+          const response = await axios.post("/api/payment/purchase", payload, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded", // 设置请求头
+            },
+          });
+
+          // 获取返回的 HTML 脚本
+          const htmlResponse  = response.data;
+
+          // 使用正则从返回的 HTML 中提取跳转 URL
+          const urlMatch = htmlResponse.match(/window\.location\.href\s*=\s*'([^']+)'/);
+
+          if (urlMatch && urlMatch[1]) {
+
+            const relativeUrl = urlMatch[1];
+
+            // 拼接完整 URL
+            const baseUrl = "https://2218466.pay.lanjingzf.com";
+            const redirectUrl = baseUrl + relativeUrl;
+
+            console.log("Redirecting to:", redirectUrl);
+            
+            // 跳转
+            window.location.href = redirectUrl;
+          } else {
+            console.error("未找到跳转 URL:", htmlResponse);
+            alert("购买失败，请稍后再试。");
+          }
+        }catch (error) {
+          console.error("购买失败:", error);
+          alert("购买失败，请稍后再试。");
+        }
+      
     },
+  },
   };
   </script>
   

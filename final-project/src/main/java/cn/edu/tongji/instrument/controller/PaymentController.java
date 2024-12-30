@@ -1,35 +1,59 @@
 package cn.edu.tongji.instrument.controller;
 
-import cn.edu.tongji.instrument.util.Md5Util;
+import cn.edu.tongji.instrument.repository.OrderRepository;
+import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
+import cn.edu.tongji.instrument.repository.RentalOrderRepository;
+
+import cn.edu.tongji.instrument.service.PaymentService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
-import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Controller
+@RequestMapping("/api/payment")
 public class PaymentController {
 
-    @Value("${payment.url}")
-    private String paymentUrl;
+    @Getter
+    private final OrderRepository orderRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
+    private final RentalOrderRepository rentalOrderRepository;
+    private final PaymentService paymentService;
 
-    @Value("${payment.secret-key}")
-    private String secretKey;
+    public PaymentController(OrderRepository orderRepository,
+                             PurchaseOrderRepository purchaseOrderRepository,
+                             RentalOrderRepository rentalOrderRepository,
+                             PaymentService paymentService)
+    {
+        this.orderRepository = orderRepository;
+        this.purchaseOrderRepository = purchaseOrderRepository;
+        this.rentalOrderRepository = rentalOrderRepository;
+        this.paymentService = paymentService;
+    }
 
-    // 提交支付请求
-    @PostMapping("/api/pay")
-    public String createOrder(
+    // 提交支付请求（购买订单）
+    @PostMapping("/purchase")
+    public String createPurchaseOrder(
+            @RequestParam("userId") Long userId, // 用户ID
+            @RequestParam("productId") Long productId, // 商品ID
+            @RequestParam("quantity") Integer  quantity, // 商品数量
             @RequestParam("type") int type, // 支付方式: 微信1/支付宝2
             @RequestParam("price") BigDecimal price, // 订单金额
             Model model
     ) {
-        // 生成商户订单号
+
+        // 调用 Service 层创建购买订单
+        Long orderId = paymentService.createPurchaseOrder(userId, productId, quantity, price);
+
+        // 构建支付页面 URL 并返回重定向
+        return paymentService.redirectToPayment(orderId, type, price, "PURCHASE");
+
+
+       /* // 生成商户订单号
         String payId = String.valueOf(System.currentTimeMillis());
         String param = "customParam"; // 可选参数
         int isHtml = 1; // 跳转到支付页面
@@ -58,31 +82,44 @@ public class PaymentController {
                 .toUriString();
 
         // 重定向到支付页面
-        return "redirect:" + requestUrl;
+        return "redirect:" + requestUrl;*/
+    }
+
+    @PostMapping("/rental")
+    public String createRentalOrder(
+            @RequestParam("userId") Long userId,
+            @RequestParam("productId") Long productId,
+            @RequestParam("rentalStart") String rentalStart, // 格式: yyyy-MM-ddTHH:mm:ss
+            @RequestParam("rentalEnd") String rentalEnd,
+            @RequestParam("deposit") BigDecimal deposit,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("type") int type, // 支付方式: 微信1/支付宝2
+            Model model
+    ) {
+        // 调用 Service 层创建租赁订单
+        Long orderId = paymentService.createRentalOrder(userId, productId, rentalStart, rentalEnd, deposit, price);
+
+        // 构建支付页面 URL 并返回重定向
+        return paymentService.redirectToPayment(orderId, type, price, "RENTAL");
     }
 
     // 回调接口
     @GetMapping("/callback")
     @ResponseBody
     public String handleCallback(
-            @RequestParam("payId") String payId,
+            @RequestParam("payId") Long payId,
             @RequestParam("param") String param,
             @RequestParam("type") int type,
             @RequestParam("price") BigDecimal price,
             @RequestParam("reallyPrice") BigDecimal reallyPrice,
             @RequestParam("sign") String sign
     ) {
-        // 校验签名
-        String signData = payId + param + type + price + reallyPrice + secretKey;
-        String expectedSign = Md5Util.md5(signData);
 
-        if (!expectedSign.equals(sign)) {
-            return "FAIL: Invalid signature";
-        }
+        // 调用 Service 层校验签名并更新订单状态
+        boolean result = paymentService.handlePaymentCallback(payId, param, type, price, reallyPrice, sign);
 
-        // 处理订单逻辑（例如更新订单状态）
-        // TODO: 在此处理订单完成逻辑
-        return "SUCCESS";
+        return result ? "SUCCESS" : "FAIL";
     }
+
 
 }
