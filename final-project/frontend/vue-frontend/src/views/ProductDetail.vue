@@ -74,6 +74,7 @@
           { id: 9, username: "Charlie", rating: 3, comment: "一般般，不太满意。", created_at: "2024-07-03" },
           { id: 10, username: "Charlie", rating: 3, comment: "一般般，不太满意。", created_at: "2024-07-03" },
         ],
+        userId: 1, // 假设当前用户的 ID 为 1，实际情况可从用户登录信息中获取
       };
     },
     computed: {
@@ -109,6 +110,51 @@
         this.$router.go(-1);
         // 直接跳转到首页
         // this.$router.push({ name: 'ToHome' });
+      },
+      async handleBuy() { 
+        try {
+          // 请求参数
+          const payload = new URLSearchParams();
+          payload.append("userId", this.userId); // 当前用户 ID
+          payload.append("productId", this.product.id); // 商品 ID
+          payload.append("quantity", 1); // 默认购买数量为 1
+          payload.append("type", 1); // 假设支付方式为支付宝（2）。微信可改为 1
+          payload.append("price", this.product.price); // 商品价格
+
+
+          // 向后端发送请求
+          const response = await axios.post("/api/payment/purchase", payload, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded", // 设置请求头
+            },
+          });
+
+          // 获取返回的 HTML 脚本
+          const htmlResponse  = response.data;
+
+          // 使用正则从返回的 HTML 中提取跳转 URL
+          const urlMatch = htmlResponse.match(/window\.location\.href\s*=\s*'([^']+)'/);
+
+          if (urlMatch && urlMatch[1]) {
+
+            const relativeUrl = urlMatch[1];
+
+            // 拼接完整 URL
+            const baseUrl = "https://2218466.pay.lanjingzf.com";
+            const redirectUrl = baseUrl + relativeUrl;
+
+            console.log("Redirecting to:", redirectUrl);
+            
+            // 跳转
+            window.location.href = redirectUrl;
+          } else {
+            console.error("未找到跳转 URL:", htmlResponse);
+            alert("购买失败，请稍后再试。");
+          }
+        }catch (error) {
+          console.error("购买失败:", error);
+          alert("购买失败，请稍后再试。");
+        }
       },
     },
   };

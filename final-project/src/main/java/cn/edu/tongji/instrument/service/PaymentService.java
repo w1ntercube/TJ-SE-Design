@@ -77,6 +77,16 @@ public class PaymentService {
         String signData = orderId + param + type + price + secretKey;
         String sign = Md5Util.md5(signData);
 
+        // 构建测试用的完整字符串
+        String testCalcString = String.format(
+                "payId=%d&param=%s&type=%d&price=%.2f&reallyPrice=%.2f&sign=%s",
+                orderId, param, type, price, price, sign
+        );
+
+        // 打印测试用字符串
+        System.out.println("Test calc String: " + testCalcString);
+
+
         // 构建支付请求URL
         String requestUrl = UriComponentsBuilder.fromHttpUrl(orderUrl)
                 .queryParam("payId", orderId.toString()) // 订单ID
@@ -88,16 +98,27 @@ public class PaymentService {
                 .toUriString();
 
         // 返回重定向 URL
-        return "redirect:" + paymentUrl + requestUrl;
+        return "redirect:" + requestUrl;
     }
 
     /**
      * 校验支付回调并更新订单状态
      */
     public boolean handlePaymentCallback(Long payId, String param, int type, BigDecimal price, BigDecimal reallyPrice, String sign) {
+
+        // 构建测试用的完整字符串
+        String testCallbackString = String.format(
+                "payId=%d&param=%s&type=%d&price=%.2f&reallyPrice=%.2f&sign=%s",
+                payId, param, type, price, reallyPrice, sign
+        );
+
+        // 打印测试用字符串
+        System.out.println("Test Callback String: " + testCallbackString);
+
         // 校验签名
-        String signData = payId + param + type + price + reallyPrice + secretKey;
+        String signData = payId + param + type + price + secretKey;
         String expectedSign = Md5Util.md5(signData);
+        System.out.println("Expected Sign: " + expectedSign);
 
         if (!expectedSign.equals(sign)) {
             return false; // 签名校验失败
