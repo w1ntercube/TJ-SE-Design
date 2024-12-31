@@ -69,7 +69,7 @@ public class PaymentService {
     /**
      * 构建支付请求的重定向 URL
      */
-    public String redirectToPayment(Long orderId, int type, BigDecimal price, String orderType) {
+    public String buildPaymentUrl(Long orderId, int type, BigDecimal price, String orderType) {
         String param = orderType; // 自定义参数区分订单类型
         int isHtml = 1; // 跳转到支付页面
 
@@ -77,28 +77,23 @@ public class PaymentService {
         String signData = orderId + param + type + price + secretKey;
         String sign = Md5Util.md5(signData);
 
-        // 构建测试用的完整字符串
-        String testCalcString = String.format(
-                "payId=%d&param=%s&type=%d&price=%.2f&reallyPrice=%.2f&sign=%s",
-                orderId, param, type, price, price, sign
-        );
+        // 回调地址
+        String notifyUrl = "https://c1b0-2001-da8-8002-6bd1-459e-4a6e-5cb7-9552.ngrok-free.app/api/payment/callback";
 
-        // 打印测试用字符串
-        System.out.println("Test calc String: " + testCalcString);
-
+        // 同步通知地址
+        String returnUrl = "http://localhost:8081/product/1";
 
         // 构建支付请求URL
-        String requestUrl = UriComponentsBuilder.fromHttpUrl(orderUrl)
-                .queryParam("payId", orderId.toString()) // 订单ID
-                .queryParam("type", String.valueOf(type)) // 支付方式
-                .queryParam("price", price.toString()) // 支付金额
-                .queryParam("sign", sign) // 签名
-                .queryParam("param", param) // 自定义参数
-                .queryParam("isHtml", isHtml) // 是否跳转支付页面
+        return UriComponentsBuilder.fromHttpUrl(orderUrl)
+                .queryParam("payId", orderId.toString())
+                .queryParam("type", String.valueOf(type))
+                .queryParam("price", price.toString())
+                .queryParam("sign", sign)
+                .queryParam("param", param)
+                .queryParam("notifyUrl", notifyUrl) // 异步通知地址
+                .queryParam("returnUrl", returnUrl) // 同步跳转地址
+                .queryParam("isHtml", isHtml)
                 .toUriString();
-
-        // 返回重定向 URL
-        return "redirect:" + requestUrl;
     }
 
     /**

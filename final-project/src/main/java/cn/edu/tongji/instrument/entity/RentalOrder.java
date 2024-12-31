@@ -33,4 +33,6 @@ public class RentalOrder extends Order {
     @Column(name = "deposit", nullable = false, precision = 10, scale = 2)
     private BigDecimal deposit;
 
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 }

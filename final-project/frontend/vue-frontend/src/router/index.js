@@ -5,6 +5,10 @@ import PasswordHandler from '../views/PasswordHandler.vue'; //修改密码页面
 import ToHome from '../views/Home.vue'; //主页面
 import UserProfile from '../views/Profile.vue';
 import ProductDetail from '@/views/ProductDetail.vue'; // 商品的详情页面
+import OrderDetail from '@/views/OrderDetail.vue'; // 订单详情页面
+import PaymentSuccess from '@/views/PaymentSuccess.vue'; // 支付成功页面
+import PaymentFailure from '@/views/PaymentFailure.vue'; // 支付失败页面
+
 
 const routes = [
   { path: '/', redirect: '/login' }, // 默认跳转到 /login
@@ -18,7 +22,27 @@ const routes = [
   },
   { path: '/home', name: 'ToHome', component: ToHome }, // 主页面路由
   { path: '/profile', name: 'UserProfile', component: UserProfile }, // 个人页面路由
-  { path: '/product/:id', name: 'ProductDetail', component: ProductDetail}, // 商品详情页面路由
+  { path: '/product/:id', name: 'ProductDetail', component: ProductDetail }, // 商品详情页面路由
+  {
+    path: "/order/:id", // 动态路由，用于访问订单详情
+    name: "OrderDetail",
+    component: OrderDetail,
+  },
+  {
+    path: '/payment-success',
+    name: 'PaymentSuccess',
+    component: PaymentSuccess,
+    props: (route) => ({
+      orderId: route.query.orderId,
+      paymentType: route.query.paymentType,
+      amount: route.query.amount,
+    }),
+  },
+  {
+    path: '/payment-failure',
+    name: 'PaymentFailure',
+    component: PaymentFailure, // 支付失败页面
+  },
 ];
 
 const router = createRouter({

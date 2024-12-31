@@ -77,7 +77,7 @@
   
   <script>
   import axios from "axios";
-  
+
   export default {
     name: "ProductDetail",
     data() {
@@ -250,7 +250,10 @@
           payload.append("type", 1); // 假设支付方式为支付宝（2）。微信可改为 1
           payload.append("price", this.product.price); // 商品价格
 
-
+          // 输出传输数据
+          const data = payload.toString();
+          console.log("请求参数:", data);
+          
           // 向后端发送请求
           const response = await axios.post("/api/payment/purchase", payload, {
             headers: {
@@ -258,28 +261,20 @@
             },
           });
 
-          // 获取返回的 HTML 脚本
-          const htmlResponse  = response.data;
+          // 获取订单号和跳转链接
+          const { orderId, price,type,redirectUrl } = response.data;
 
-          // 使用正则从返回的 HTML 中提取跳转 URL
-          const urlMatch = htmlResponse.match(/window\.location\.href\s*=\s*'([^']+)'/);
+          // 保存订单信息到 localStorage
+          const orderInfo = {
+            orderId: orderId,
+            productId: this.product.id,
+            price: price,
+            paymentType: type === "微信支付" ? "微信" : "支付宝",
+          };
+          localStorage.setItem("currentOrder", JSON.stringify(orderInfo)); // 保存订单信息
 
-          if (urlMatch && urlMatch[1]) {
+          window.location.href = redirectUrl;
 
-            const relativeUrl = urlMatch[1];
-
-            // 拼接完整 URL
-            const baseUrl = "https://2218466.pay.lanjingzf.com";
-            const redirectUrl = baseUrl + relativeUrl;
-
-            console.log("Redirecting to:", redirectUrl);
-            
-            // 跳转
-            window.location.href = redirectUrl;
-          } else {
-            console.error("未找到跳转 URL:", htmlResponse);
-            alert("购买失败，请稍后再试。");
-          }
         }catch (error) {
           console.error("购买失败:", error);
           alert("购买失败，请稍后再试。");
