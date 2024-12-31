@@ -244,7 +244,7 @@
         try {
           // 请求参数
           const payload = new URLSearchParams();
-          payload.append("userId", this.userId); // 当前用户 ID
+          payload.append("userId", 1); // 默认用户 ID
           payload.append("productId", this.product.id); // 商品 ID
           payload.append("quantity", 1); // 默认购买数量为 1
           payload.append("type", 1); // 假设支付方式为支付宝（2）。微信可改为 1
@@ -279,7 +279,6 @@
           console.error("购买失败:", error);
           alert("购买失败，请稍后再试。");
         }
-      
     },
   },
   };
