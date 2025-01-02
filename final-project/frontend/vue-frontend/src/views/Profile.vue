@@ -13,6 +13,7 @@
         <button @click="setActiveTab('consumerOrders')" :class="{ active: activeTab === 'consumerOrders' }">消费订单</button>
         <button @click="setActiveTab('storeOrders')" :class="{ active: activeTab === 'storeOrders' }">店铺订单</button>
         <button @click="setActiveTab('addProduct')" :class="{ active: activeTab === 'addProduct' }">上架商品</button>
+        <button @click="setActiveTab('goAi')" :class="{ active: activeTab === 'goAi' }">乐器大师</button>
         <button @click="goBack">返回首页</button>
 
 
@@ -201,6 +202,41 @@
 
 
       </div>
+
+
+             <!--               询问AI             -->       
+             <div v-if="activeTab === 'goAi'" class="ai-chat-container">
+            <h2>乐器大师</h2>
+           <div class="ai-chat-box">
+           <div
+               class="ai-chat-message"
+               v-for="(message, index) in messages"
+      :key="index"
+      :class="{ 'ai-user-message': message.sender === 'user', 'ai-ai-message': message.sender === 'ai' }"
+    >
+      <div class="ai-message-content">
+        <img
+          v-if="message.sender === 'ai'"
+          src="@/Resources/user.jpg"
+          alt="AI头像"
+          class="ai-avatar"
+        />
+        <div class="ai-text">{{ message.content }}</div>
+        <img
+          v-if="message.sender === 'user'"
+          :src="user.avatarUrl"
+          alt="用户头像"
+          class="ai-avatar"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="ai-input-area">
+    <textarea v-model="userInput" placeholder="请输入您的问题..."></textarea>
+    <button @click="sendMessage">发送</button>
+  </div>
+</div>
+       <!--               询问AI             -->  
     </div>
   </div>
 </template>
@@ -232,6 +268,9 @@ export default {
         orderType: "", // 订单类型：PURCHASE 或 RENTAL
         orderStatus: "", // 订单状态：OrderStatus 枚举值
       },
+
+      messages: [], //初始化消息数组
+      userInput:"", //用户输入内容
     };
   },
   methods: {
@@ -559,6 +598,30 @@ export default {
 
 
 
+  //发送消息给AI
+  sendMessage() {
+      if (this.userInput.trim() === "") {
+        alert("请输入内容后发送！");
+        return;
+      }
+
+      // 添加用户消息到消息列表
+      this.messages.push({
+        sender: "user",
+        content: this.userInput,
+      });
+
+      // 清空输入框
+      this.userInput = "";
+
+      // 模拟 AI 回复
+      setTimeout(() => {
+        this.messages.push({
+          sender: "ai",
+          content: "你好！你好！",
+        });
+      }, 1000); // 模拟延迟
+    },
 
 
 
@@ -959,6 +1022,135 @@ button:hover {
   .filter-button:hover {
     background-color: #04fffb;
   }
+
+
+  /* ai界面 */
+.ai-chat-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 1200px;
+  height: 80vh; /* 界面高度 */
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #f7f9fc;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.ai-chat-box {
+  flex-grow: 1; /* 填充剩余空间 */
+  max-height: calc(100% - 60px); /* 留出底部输入框空间 */
+  overflow-y: auto; /* 超出部分滚动 */
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.ai-chat-message {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  max-width: 100%;
+}
+
+.ai-chat-message.ai-user-message {
+  justify-content: flex-end; /* 用户消息靠右 */
+}
+
+.ai-chat-message.ai-ai-message {
+  justify-content: flex-start; /* AI 消息靠左 */
+}
+
+.ai-message-content {
+  display: flex;
+  flex-direction: row; /* 确保头像和消息并排 */
+  align-items: flex-start; /* 顶部对齐 */
+  gap: 10px;
+}
+
+.ai-avatar {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ai-text {
+  padding: 15px;
+  font-size: 16px;
+  background-color: #e8e8e8;
+  border-radius: 10px;
+  word-wrap: break-word;
+  box-sizing: border-box; /* 包括padding在内的宽度限制 */
+  text-align: left;
+}
+
+.ai-user-message .ai-text {
+  background-color: #d1f7c4;
+}
+
+.ai-ai-message .ai-text {
+  background-color: #f1f1f1;
+}
+
+.ai-input-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background-color: #ffffff;
+}
+
+.ai-input-area textarea {
+  flex-grow: 1;
+  resize: none;
+  height: 40px; /* 调整输入框高度 */
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ai-input-area button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+  width: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.ai-input-area button:hover {
+  background-color: #45a049;
+}
+
+/* 滚动条样式 */
+.ai-chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ai-chat-box::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.ai-chat-box::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.ai-chat-box::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
 
 
 </style>
