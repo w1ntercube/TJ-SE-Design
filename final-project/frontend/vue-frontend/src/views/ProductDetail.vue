@@ -120,6 +120,53 @@
       </div>
     </div>
 
+
+  <!-- 租借弹窗 -->
+  <div v-if="showRentalDialog" class="rental-dialog">
+    <div class="dialog-overlay" @click="closeRentalDialog"></div>
+    <div class="dialog-content">
+      <h3>租借商品</h3>
+      <div class="dialog-form">
+        <!-- 输入租借天数 -->
+        <label for="rentalDays">租借天数：</label>
+        <input
+          id="rentalDays"
+          type="number"
+          v-model="rentalDetails.days"
+          min="1"
+          placeholder="请输入租借天数"
+        />
+
+        <!-- 输入租借数量 -->
+        <label for="quantity">租借数量：</label>
+        <input
+          id="quantity"
+          type="number"
+          v-model="rentalDetails.quantity"
+          min="1"
+        />
+
+        <!-- 支付方式 -->
+        <label for="payment-type">选择支付方式：</label>
+        <div class="payment-options">
+          <label>
+            <input type="radio" value="1" v-model="rentalDetails.type" />
+            微信支付
+          </label>
+          <label>
+            <input type="radio" value="2" v-model="rentalDetails.type" />
+            支付宝支付
+          </label>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="action-button" @click="confirmRental">确认租借</button>
+        <button class="action-button cancel-button" @click="closeRentalDialog">取消</button>
+      </div>
+    </div>
+  </div>
+
+
 </template>
   
   <script>
@@ -144,6 +191,15 @@
         purchaseDetails: {
           quantity: 1, // 默认购买数量
           type: 1, // 默认支付方式，1表示微信
+        },
+
+        // 租借弹窗相关
+        showRentalDialog: false, // 控制租借弹窗显示
+        rentalDetails: {
+          days: 1, // 默认租借天数
+          quantity: 1,
+          type: 1, // 默认支付方式
+          deposit: 0.1, // 默认押金
         },
       };
     },
@@ -334,14 +390,6 @@
 
         },
 
-
-      async handleBuy() { 
-        this.showPurchaseDialog = true;
-      },
-      closeDialog() {
-        this.showPurchaseDialog = false;
-      },
-
         // 确认购买
       async confirmPurchase() {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -354,7 +402,7 @@
         try {
           const payload = new URLSearchParams();
           payload.append("userId", userId); // 默认用户 ID
-          payload.append("productId", this.product.id); // 商品 ID
+          payload.append("productId", this.$route.params.id); // 商品 ID
           payload.append("quantity", this.purchaseDetails.quantity); // 用户选择的购买数量
           payload.append("type", this.purchaseDetails.type); // 用户选择的支付方式
           payload.append("price", this.product.price * this.purchaseDetails.quantity); // 总价格
@@ -372,7 +420,7 @@
             "currentOrder",
             JSON.stringify({
               orderId,
-              productId: this.product.id,
+              productId: this.$route.params.id,
               price: this.product.price * this.purchaseDetails.quantity,
               paymentType: this.purchaseDetails.type === 1 ? "微信" : "支付宝",
             })
@@ -385,6 +433,94 @@
         } finally {
           this.closeDialog(); // 无论成功与否，都关闭弹窗
         }
+      },
+
+      async confirmRental() {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser || !storedUser.id) {
+          alert("用户未登录，请先登录！");
+          this.closeRentalDialog();
+          return;
+        }
+
+        const userId = storedUser.id;
+
+        // 验证用户输入
+        if (!this.rentalDetails.days || this.rentalDetails.days <= 0) {
+          alert("请输入有效的租借天数！");
+          return;
+        }
+
+        if (!this.product || !this.product.id) {
+          alert("商品信息加载失败，请稍后再试！");
+          this.closeRentalDialog();
+          return;
+        }
+
+        const productId = this.product.id;
+
+        try {
+          const payload = new URLSearchParams();
+          payload.append("userId", userId);
+          payload.append("productId", productId);
+          payload.append("days", this.rentalDetails.days); // 租借天数
+          payload.append("deposit", this.rentalDetails.deposit.toFixed(2));
+          payload.append("price", this.product.price.toFixed(2));
+          payload.append("quantity", this.rentalDetails.quantity);
+          payload.append("type", this.rentalDetails.type);
+
+          console.log(Object.fromEntries(payload.entries()));
+
+          const response = await axios.post("/api/payment/rental", payload, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          });
+
+          const { orderId, redirectUrl } = response.data;
+
+          localStorage.setItem(
+            "currentRentalOrder",
+            JSON.stringify({
+              orderId,
+              productId,
+              rentalDays: this.rentalDetails.days,
+              deposit: this.rentalDetails.deposit,
+              price: this.product.price,
+              paymentType: this.rentalDetails.type === 1 ? "微信" : "支付宝",
+            })
+          );
+
+          window.location.href = redirectUrl;
+        } catch (error) {
+          console.error("租借失败:", error);
+          alert("租借失败，请稍后再试。");
+        } finally {
+          this.closeRentalDialog();
+        }
+      },
+
+
+      async handleBuy() { 
+        this.showPurchaseDialog = true;
+      },
+      closeDialog() {
+        this.showPurchaseDialog = false;
+      },
+
+      // 打开租借弹窗
+      handleRent() {
+        this.showRentalDialog = true;
+      },
+
+      // 关闭租借弹窗
+      closeRentalDialog() {
+        this.showRentalDialog = false;
+      },
+
+      formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toISOString().split(".")[0]; // 去掉毫秒和时区信息
       },
     },
   };
@@ -861,6 +997,73 @@
   }
 
   .dialog-actions .action-button:hover {
+    transform: scale(1.05);
+  }
+
+
+  /* 租借弹窗样式 */
+  .rental-dialog .dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  .rental-dialog .dialog-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-align: center;
+  }
+
+  .rental-dialog .dialog-form label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .rental-dialog .dialog-form input[type="datetime-local"] {
+    width: calc(100% - 20px);
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  .rental-dialog .dialog-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .rental-dialog .action-button {
+    flex: 1;
+    padding: 10px;
+    background-color: #0ec1e9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .rental-dialog .cancel-button {
+    background-color: #f44336;
+  }
+
+  .rental-dialog .action-button:hover {
     transform: scale(1.05);
   }
 

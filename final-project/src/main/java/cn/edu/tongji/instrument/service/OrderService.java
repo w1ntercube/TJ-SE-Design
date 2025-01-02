@@ -25,31 +25,6 @@ public class OrderService {
     @Autowired
     private RentalOrderRepository rentalOrderRepository;
 
-    // 创建购买订单
-    public PurchaseOrder createPurchaseOrder(Long userId, Long productId, Integer quantity, BigDecimal totalPrice) {
-        PurchaseOrder order = new PurchaseOrder();
-        order.setUserId(userId);
-        order.setProductId(productId);
-        order.setQuantity(quantity);
-        order.setTotalPrice(totalPrice);
-        order.setOrderStatus(OrderStatus.PENDING);
-        return purchaseOrderRepository.save(order);
-    }
-
-    // 创建租赁订单
-    public RentalOrder createRentalOrder(Long userId, Long productId, BigDecimal totalPrice, BigDecimal deposit,
-                                         LocalDateTime rentalStart, LocalDateTime rentalEnd) {
-        RentalOrder order = new RentalOrder();
-        order.setUserId(userId);
-        order.setProductId(productId);
-        order.setTotalPrice(totalPrice);
-        order.setDeposit(deposit);
-        order.setRentalStart(rentalStart);
-        order.setRentalEnd(rentalEnd);
-        order.setRentalDurationDays((int) rentalStart.until(rentalEnd, java.time.temporal.ChronoUnit.DAYS));
-        order.setOrderStatus(OrderStatus.PENDING);
-        return rentalOrderRepository.save(order);
-    }
 
     // 查询所有订单
     public List<Order> getAllOrders() {

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Setter
@@ -21,11 +22,13 @@ public class RentalOrder extends Order {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
-    @Column(name = "rental_start", nullable = false)
-    private LocalDateTime rentalStart;
+    // 用户实际租借开始时间或计划开始时间
+    @Column(name = "rental_start", nullable = true) // 允许为NULL
+    private LocalDate rentalStart;
 
-    @Column(name = "rental_end", nullable = false)
-    private LocalDateTime rentalEnd;
+    // 用户实际租借结束时间或计划结束时间
+    @Column(name = "rental_end", nullable = true) // 允许为NULL
+    private LocalDate rentalEnd;
 
     @Column(name = "rental_duration_days", nullable = false)
     private Integer rentalDurationDays;

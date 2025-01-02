@@ -68,16 +68,23 @@ public class PaymentService {
     /**
      * 创建租赁订单
      */
-    public Long createRentalOrder(Long userId, Long productId, String rentalStart, String rentalEnd, BigDecimal deposit, BigDecimal price) {
+    public Long createRentalOrder(Long userId,
+                                  Long productId,
+                                  Integer rentalDurationDays,
+                                  BigDecimal deposit,
+                                  BigDecimal price,
+                                  int quantity) {
         RentalOrder order = new RentalOrder();
         order.setUserId(userId);
         order.setProductId(productId);
-        order.setRentalStart(LocalDateTime.parse(rentalStart));
-        order.setRentalEnd(LocalDateTime.parse(rentalEnd));
-        order.setRentalDurationDays((int) (order.getRentalEnd().toLocalDate().toEpochDay() - order.getRentalStart().toLocalDate().toEpochDay()));
+        order.setRentalDurationDays(rentalDurationDays);
+        order.setRentalStart(null); // 初始为空
+        order.setRentalEnd(null);   // 初始为空
         order.setDeposit(deposit);
         order.setTotalPrice(price);
+        order.setQuantity(quantity);
         order.setOrderStatus(OrderStatus.PENDING); // 待支付
+
         rentalOrderRepository.save(order);
         return order.getId();
     }

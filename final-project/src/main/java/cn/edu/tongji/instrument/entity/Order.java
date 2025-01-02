@@ -36,6 +36,10 @@ public abstract class Order {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Setter
+    @Column(name = "address", nullable = false, length = 255)
+    private String address; // 新增字段：订单地址
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

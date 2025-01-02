@@ -18,32 +18,6 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    // 创建购买订单
-    @PostMapping("/purchase")
-    public ResponseEntity<Order> createPurchaseOrder(
-            @RequestParam Long userId,
-            @RequestParam Long productId,
-            @RequestParam Integer quantity,
-            @RequestParam BigDecimal totalPrice
-    ) {
-        PurchaseOrder order = orderService.createPurchaseOrder(userId, productId, quantity, totalPrice);
-        return ResponseEntity.ok(order);
-    }
-
-    // 创建租赁订单
-    @PostMapping("/rental")
-    public ResponseEntity<Order> createRentalOrder(
-            @RequestParam Long userId,
-            @RequestParam Long productId,
-            @RequestParam BigDecimal totalPrice,
-            @RequestParam BigDecimal deposit,
-            @RequestParam LocalDateTime rentalStart,
-            @RequestParam LocalDateTime rentalEnd
-    ) {
-        RentalOrder order = orderService.createRentalOrder(userId, productId, totalPrice, deposit, rentalStart, rentalEnd);
-        return ResponseEntity.ok(order);
-    }
-
     // 查询所有订单
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {

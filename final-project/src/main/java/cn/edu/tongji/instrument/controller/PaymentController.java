@@ -1,16 +1,22 @@
 package cn.edu.tongji.instrument.controller;
 
+import cn.edu.tongji.instrument.entity.RentalOrder;
 import cn.edu.tongji.instrument.repository.OrderRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
 
 import cn.edu.tongji.instrument.service.PaymentService;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,21 +71,35 @@ public class PaymentController {
     }
 
     @PostMapping("/rental")
-    public String createRentalOrder(
+    public Map<String, String> createRentalOrder(
             @RequestParam("userId") Long userId,
             @RequestParam("productId") Long productId,
-            @RequestParam("rentalStart") String rentalStart, // 格式: yyyy-MM-ddTHH:mm:ss
-            @RequestParam("rentalEnd") String rentalEnd,
+            @RequestParam("days") int days, // 租借天数
             @RequestParam("deposit") BigDecimal deposit,
             @RequestParam("price") BigDecimal price,
             @RequestParam("type") int type, // 支付方式: 微信1/支付宝2
+            @RequestParam("quantity") Integer quantity,
             Model model
     ) {
-        // 调用 Service 层创建租赁订单
-        Long orderId = paymentService.createRentalOrder(userId, productId, rentalStart, rentalEnd, deposit, price);
 
-        // 构建支付页面 URL 并返回重定向
-        return paymentService.buildPaymentUrl(orderId, type, price, "RENTAL");
+        // 调用 Service 层创建租赁订单
+        Long orderId = paymentService.createRentalOrder(
+                userId, productId, days, deposit, price, quantity
+        );
+
+        // 构建支付页面 URL
+        String redirectUrl = paymentService.buildPaymentUrl(orderId, type, price, "RENTAL");
+
+        System.out.println(redirectUrl);
+
+        // 返回订单信息和支付跳转链接
+        Map<String, String> response = new HashMap<>();
+        response.put("orderId", orderId.toString());
+        response.put("type", type == 1 ? "微信支付" : "支付宝支付");
+        response.put("price", price.toString());
+        response.put("redirectUrl", redirectUrl);
+
+        return response;
     }
 
     // 回调接口
@@ -131,4 +151,23 @@ public class PaymentController {
         }
         return response;
     }
+
+    @PostMapping("/rental/update-dates")
+    public ResponseEntity<String> updateRentalDates(
+            @RequestParam("orderId") Long orderId,
+            @RequestParam("rentalStart") String rentalStart, // 格式: yyyy-MM-dd
+            @RequestParam("rentalEnd") String rentalEnd     // 格式: yyyy-MM-dd
+    ) {
+        RentalOrder rentalOrder = rentalOrderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "订单未找到"));
+
+        // 更新字段
+        rentalOrder.setRentalStart(LocalDate.parse(rentalStart));
+        rentalOrder.setRentalEnd(LocalDate.parse(rentalEnd));
+
+        rentalOrderRepository.save(rentalOrder);
+
+        return ResponseEntity.ok("租借时间已更新");
+    }
+
 }
