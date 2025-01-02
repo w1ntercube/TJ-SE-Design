@@ -74,6 +74,52 @@
       </div>
     </div>
 
+    <!-- 购买弹窗 -->
+    <div v-if="showPurchaseDialog" class="purchase-dialog">
+      <div class="dialog-overlay" @click="closeDialog"></div>
+      <div class="dialog-content">
+        <h3>购买商品</h3>
+        <div class="dialog-form">
+          <label for="quantity">购买数量：</label>
+          <input
+            id="quantity"
+            type="number"
+            v-model="purchaseDetails.quantity"
+            min="1"
+            max="product.stock"
+          />
+
+          <label for="payment-type">选择支付方式：</label>
+          <div class="payment-options">
+            <label>
+              <input
+                type="radio"
+                value="1"
+                v-model="purchaseDetails.type"
+              />
+              微信支付
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="2"
+                v-model="purchaseDetails.type"
+              />
+              支付宝支付
+            </label>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button class="action-button" @click="confirmPurchase">
+            确认购买
+          </button>
+          <button class="action-button cancel-button" @click="closeDialog">
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
+
 </template>
   
   <script>
@@ -92,7 +138,13 @@
           rating: 5,
         },
         isLoading: true, // 是否正在加载数据
-        
+
+        // 购买弹窗相关
+        showPurchaseDialog: false, // 控制弹窗显示
+        purchaseDetails: {
+          quantity: 1, // 默认购买数量
+          type: 1, // 默认支付方式，1表示微信
+        },
       };
     },
     computed: {
@@ -284,46 +336,57 @@
 
 
       async handleBuy() { 
-        try {
-          // 请求参数
-          const payload = new URLSearchParams();
-          payload.append("userId", 1); // 默认用户 ID
-          payload.append("productId", this.product.id); // 商品 ID
-          payload.append("quantity", 1); // 默认购买数量为 1
-          payload.append("type", 1); // 假设支付方式为支付宝（2）。微信可改为 1
-          payload.append("price", this.product.price); // 商品价格
+        this.showPurchaseDialog = true;
+      },
+      closeDialog() {
+        this.showPurchaseDialog = false;
+      },
 
-          // 输出传输数据
-          const data = payload.toString();
-          console.log("请求参数:", data);
-          
-          // 向后端发送请求
+        // 确认购买
+      async confirmPurchase() {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+
+        if (storedUser && storedUser.id) {
+          const userId = storedUser.id; // 当前用户的 ID
+          console.log("当前用户 ID:", userId);
+        }
+        const userId = storedUser.id;
+        try {
+          const payload = new URLSearchParams();
+          payload.append("userId", userId); // 默认用户 ID
+          payload.append("productId", this.product.id); // 商品 ID
+          payload.append("quantity", this.purchaseDetails.quantity); // 用户选择的购买数量
+          payload.append("type", this.purchaseDetails.type); // 用户选择的支付方式
+          payload.append("price", this.product.price * this.purchaseDetails.quantity); // 总价格
+
           const response = await axios.post("/api/payment/purchase", payload, {
             headers: {
-              "Content-Type": "application/x-www-form-urlencoded", // 设置请求头
+              "Content-Type": "application/x-www-form-urlencoded",
             },
           });
 
-          // 获取订单号和跳转链接
-          const { orderId, price,type,redirectUrl } = response.data;
+          const { orderId, redirectUrl } = response.data;
 
           // 保存订单信息到 localStorage
-          const orderInfo = {
-            orderId: orderId,
-            productId: this.product.id,
-            price: price,
-            paymentType: type === "微信支付" ? "微信" : "支付宝",
-          };
-          localStorage.setItem("currentOrder", JSON.stringify(orderInfo)); // 保存订单信息
+          localStorage.setItem(
+            "currentOrder",
+            JSON.stringify({
+              orderId,
+              productId: this.product.id,
+              price: this.product.price * this.purchaseDetails.quantity,
+              paymentType: this.purchaseDetails.type === 1 ? "微信" : "支付宝",
+            })
+          );
 
           window.location.href = redirectUrl;
-
-        }catch (error) {
+        } catch (error) {
           console.error("购买失败:", error);
           alert("购买失败，请稍后再试。");
+        } finally {
+          this.closeDialog(); // 无论成功与否，都关闭弹窗
         }
+      },
     },
-  },
   };
   </script>
   
@@ -701,6 +764,105 @@
     .delete-comment-button:hover {
       color: darkred; /* 悬停时颜色变化 */
     }
+
+  /* 弹窗的背景遮罩 */
+  .dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999; /* 遮罩层在最上层 */
+  }
+
+  /* 弹窗的内容容器 */
+  .dialog-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* 弹窗内容高于遮罩层 */
+    text-align: center;
+  }
+
+  /* 弹窗标题 */
+  .dialog-content h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  /* 弹窗表单 */
+  .dialog-form {
+    margin-bottom: 20px;
+  }
+
+  .dialog-form label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .dialog-form input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  .payment-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .payment-options label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .payment-options input[type="radio"] {
+    cursor: pointer;
+  }
+
+  /* 弹窗按钮组 */
+  .dialog-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .dialog-actions .action-button {
+    flex: 1;
+    padding: 10px;
+    background-color: #0ec1e9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .dialog-actions .cancel-button {
+    background-color: #f44336;
+  }
+
+  .dialog-actions .action-button:hover {
+    transform: scale(1.05);
+  }
 
   </style>
   

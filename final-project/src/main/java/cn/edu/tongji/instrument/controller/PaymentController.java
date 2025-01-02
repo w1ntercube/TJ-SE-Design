@@ -115,4 +115,20 @@ public class PaymentController {
             return "fail";
         }
     }
+
+    // 查询订单状态并更新
+    @GetMapping("/queryStatus")
+    public Map<String, String> queryOrderStatus(@RequestParam("orderId") Long orderId) {
+        boolean result = paymentService.queryAndUpdateOrderStatus(orderId);
+
+        Map<String, String> response = new HashMap<>();
+        if (result) {
+            response.put("status", "success");
+            response.put("message", "Order status updated successfully.");
+        } else {
+            response.put("status", "fail");
+            response.put("message", "Failed to update order status.");
+        }
+        return response;
+    }
 }

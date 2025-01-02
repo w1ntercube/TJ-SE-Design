@@ -87,6 +87,12 @@
       });
 
       // 登录成功逻辑
+      const userData = response.data; // 假设返回的数据中有 `id`、`username` 等用户信息
+
+      // 将用户信息存储到 localStorage
+      localStorage.setItem("user", JSON.stringify(userData));
+      
+      // 登录成功逻辑
       alert(`欢迎回来，${response.data.username}！`);
       // 保存用户信息到 localStorage 或 Vuex（可选）
       localStorage.setItem("user", JSON.stringify(response.data));

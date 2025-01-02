@@ -1,11 +1,14 @@
 package cn.edu.tongji.instrument.service;
 
+import cn.edu.tongji.instrument.entity.Order;
 import cn.edu.tongji.instrument.entity.PurchaseOrder;
 import cn.edu.tongji.instrument.entity.RentalOrder;
 import cn.edu.tongji.instrument.entity.enums.OrderStatus;
+import cn.edu.tongji.instrument.repository.OrderRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
 import cn.edu.tongji.instrument.util.Md5Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,10 +40,15 @@ public class PaymentService {
 
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
+    private final OrderRepository orderRepository;
 
-    public PaymentService(PurchaseOrderRepository purchaseOrderRepository, RentalOrderRepository rentalOrderRepository) {
+
+    public PaymentService(PurchaseOrderRepository purchaseOrderRepository,
+                          RentalOrderRepository rentalOrderRepository,
+                          OrderRepository orderRepository) {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.rentalOrderRepository = rentalOrderRepository;
+        this.orderRepository = orderRepository;
     }
 
     /**
@@ -85,9 +93,9 @@ public class PaymentService {
 
         // 计算签名
         String signData = orderId.toString() + param + type + formattedPrice + secretKey;
-        System.out.println("SignData: " + signData);
+        // System.out.println("SignData: " + signData);
         String sign = Md5Util.getMD5Code(signData);
-        System.out.println("Sign: " + sign);
+        // System.out.println("Sign: " + sign);
 
         // 构建支付请求URL
         return UriComponentsBuilder.fromHttpUrl(orderUrl)
@@ -109,12 +117,12 @@ public class PaymentService {
 
         // 构建签名数据
         String signData = payId + param + type + price + reallyPrice + secretKey;
-        System.out.println("Sign Data: " + signData);
+        // System.out.println("Sign Data: " + signData);
 
         // 计算签名
         String expectedSign = Md5Util.getMD5Code(signData);
-        System.out.println("Expected Sign: " + expectedSign);
-        System.out.println("Actual Sign: " + sign);
+        // System.out.println("Expected Sign: " + expectedSign);
+        // System.out.println("Actual Sign: " + sign);
 
         // 校验签名
         if (!expectedSign.equals(sign)) {
@@ -164,4 +172,94 @@ public class PaymentService {
         return true; // 回调成功处理
     }
 
+    // 调用支付平台接口查询订单状态
+    public boolean queryAndUpdateOrderStatus(Long orderId) {
+
+        String requestUrl = paymentUrl + "/checkOrder?orderId=" + orderId;
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            // 解析支付平台返回数据
+            String responseBody = response.getBody();
+            PaymentResponse paymentResponse = parseResponse(responseBody);
+
+            if (paymentResponse == null) {
+                System.out.println("Invalid response from payment platform for orderId: " + orderId);
+                return false;
+            }
+
+            // 根据支付状态更新订单
+            Order order = orderRepository.findById(orderId).orElse(null);
+            if (order == null) {
+                System.out.println("Order not found for orderId: " + orderId);
+                return false;
+            }
+
+            if (paymentResponse.getCode() == 1) {
+                // 如果订单已支付
+                if (order.getOrderStatus() != OrderStatus.PAID) {
+                    order.setOrderStatus(OrderStatus.PAID);
+                    orderRepository.save(order);
+                    System.out.println("Order " + orderId + " marked as PAID.");
+                }
+            } else if (paymentResponse.getCode() == -1) {
+                // 如果订单未支付并已超时
+                if (order.getOrderStatus() == OrderStatus.PENDING &&
+                        order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+                    order.setOrderStatus(OrderStatus.CANCELLED);
+                    orderRepository.save(order);
+                    System.out.println("Order " + orderId + " marked as CANCELLED due to timeout.");
+                }
+            }
+            return true;
+        } else {
+            System.out.println("Failed to query payment platform for orderId: " + orderId);
+            return false;
+        }
+    }
+
+    // 解析支付平台返回的数据
+    private PaymentResponse parseResponse(String responseBody) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(responseBody, PaymentResponse.class);
+        } catch (Exception e) {
+            System.out.println("Error parsing payment response: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // 内部类：支付平台响应映射
+    private static class PaymentResponse {
+        private int code; // 1: 支付成功，-1: 未支付或失败
+        private String msg;
+        private String data;
+
+        // Getters and Setters
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public void setData(String data) {
+            this.data = data;
+        }
+    }
 }
