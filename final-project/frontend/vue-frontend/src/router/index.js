@@ -8,6 +8,8 @@ import ProductDetail from '@/views/ProductDetail.vue'; // 商品的详情页面
 import OrderDetail from '@/views/OrderDetail.vue'; // 订单详情页面
 import PaymentSuccess from '@/views/PaymentSuccess.vue'; // 支付成功页面
 import PaymentFailure from '@/views/PaymentFailure.vue'; // 支付失败页面
+import BannedProfile from '@/views/Banned.vue'; //用户被ban界面
+import AdminProfile from '@/views/Admin.vue'; //管理员页面
 
 
 const routes = [
@@ -23,6 +25,8 @@ const routes = [
   { path: '/home', name: 'ToHome', component: ToHome }, // 主页面路由
   { path: '/profile', name: 'UserProfile', component: UserProfile }, // 个人页面路由
   { path: '/product/:id', name: 'ProductDetail', component: ProductDetail }, // 商品详情页面路由
+  { path: '/banned', name: 'BannedProfile', component: BannedProfile }, // banned页面路由
+  { path: '/admin', name: 'AdminProfile', component: AdminProfile }, // 管理员页面路由
   {
     path: "/order/:id", // 动态路由，用于访问订单详情
     name: "OrderDetail",
@@ -43,6 +47,7 @@ const routes = [
     name: 'PaymentFailure',
     component: PaymentFailure, // 支付失败页面
   },
+
 ];
 
 const router = createRouter({

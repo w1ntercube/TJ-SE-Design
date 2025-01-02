@@ -69,12 +69,10 @@ public class UserController {
         }
     }
 
-
     // 查询所有用户
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
+    @GetMapping("/allusers")
+    public List<User> getAllUsers(){return userService.getAllUsers();};
+
 
     // 根据 ID 查询用户
     @GetMapping("/{id}")
@@ -144,5 +142,25 @@ public class UserController {
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Error uploading image: " + e.getMessage());
         }
+    }
+
+    //封禁用户接口
+    @PostMapping("/{id}/ban")
+    public ResponseEntity<User> banUser(@PathVariable Long id) {
+        System.out.println("收到封禁请求，用户ID：" + id);
+        return ResponseEntity.ok(userService.banUser(id));
+    }
+
+    // 解除封禁用户
+    @PostMapping("/{id}/unban")
+    public ResponseEntity<User> unbanUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.unbanUser(id));
+    }
+
+    //调整信誉积分
+    @PostMapping("/{id}/{delta}/reputation")
+    public ResponseEntity<User> updateReputationScore(@PathVariable Long id, @PathVariable Integer delta) {
+        User updatedUser = userService.updateReputationScore(id, delta);
+        return ResponseEntity.ok(updatedUser);
     }
 }
