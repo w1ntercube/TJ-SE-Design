@@ -423,14 +423,6 @@
 
         },
 
-
-      async handleBuy() { 
-        this.showPurchaseDialog = true;
-      },
-      closeDialog() {
-        this.showPurchaseDialog = false;
-      },
-
         // 确认购买
       async confirmPurchase() {
         const storedUser = JSON.parse(localStorage.getItem("user"));
