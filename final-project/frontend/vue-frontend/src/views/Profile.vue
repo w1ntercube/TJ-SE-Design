@@ -10,134 +10,196 @@
         <button @click="setActiveTab('profile')" :class="{ active: activeTab === 'profile' }">个人中心</button>
         <button @click="setActiveTab('favorites')" :class="{ active: activeTab === 'favorites' }">我的收藏</button>
         <button @click="setActiveTab('products')" :class="{ active: activeTab === 'products' }">我的商品</button>
-        <button @click="setActiveTab('orders')" :class="{ active: activeTab === 'orders' }">我的订单</button>
+        <button @click="setActiveTab('consumerOrders')" :class="{ active: activeTab === 'consumerOrders' }">消费订单</button>
+        <button @click="setActiveTab('storeOrders')" :class="{ active: activeTab === 'storeOrders' }">店铺订单</button>
         <button @click="setActiveTab('addProduct')" :class="{ active: activeTab === 'addProduct' }">上架商品</button>
         <button @click="goBack">返回首页</button>
+
+
       </div>
     </div>
 
     <!-- 右侧内容区 -->
     <div class="right-panel">
-      <div v-if="activeTab === 'profile'">
-      <div class="avatar-upload">
-        <h2>上传崭新的头像吧！</h2>
-        <input type="file" id="avatar-image" ref="avatarImage" @change="handleAvatarUpload" />
-        <button @click="submitAvatar">提交</button>
-      </div>
-    </div>
 
-    <div v-if="activeTab === 'favorites'">
-      <h2>我的收藏</h2>
-      <div v-if="favoriteProducts.length > 0" class="product-list">
-        <div
-          v-for="product in favoriteProducts"
-          :key="product.id"
-          class="product-item"
-          @click="goToProductPage(product.id)"
-        >
-          <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
-          <div class="product-info">
-            <h3>{{ product.name }}</h3>
-            <p>价格：￥{{ product.price }}</p>
-            <p>库存：{{ product.stock }}</p>
-          </div>
-          <button @click.stop="removeFromFavorites(product.id)" class="remove-button">移除收藏</button>
-        </div>
-      </div>
-      <div v-else>
-        <p>您还没有收藏任何商品。</p>
-      </div>
-    </div>
-
-
-    <div v-if="activeTab === 'products'">
-      <h2>我的商品</h2>
-        <div v-if="products.length > 0" class="product-list">
-          <div v-for="product in products" :key="product.id" class="product-item" @click="goToProductPage(product.id)">
-            <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
-            <div class="product-info">
-              <h3>{{ product.name }}</h3>
-              <p>价格：￥{{ product.price }}</p>
-              <p>库存：{{ product.stock }}</p>
-            </div>
-            <div class="Stock-input" @click.stop>
-            <!-- 添加库存数量输入框 -->
-            <input 
-              type="number" 
-              v-model="product.addStocks" 
-              min="1" 
-              placeholder="补充库存数量" 
-            />
-            <!-- 减少库存数量输入框 -->
-            <input 
-              type="number" 
-              v-model="product.lessStocks" 
-              min="1" 
-              placeholder="减少库存数量" 
-            />
-          </div>
-          <div class="buttonInput" >
-            <!-- 补充库存按钮 -->
-            <button @click.stop="addStock(product.id, product.addStocks)" class="Stock-button">补充库存</button>
-            <!-- 减少库存按钮 -->
-            <button @click.stop="lessStock(product.id, product.lessStocks)" class="Stock-button">减少库存</button>
-          </div>
-            
-            <button @click.stop="removeProduct(product.id)" class="remove-button">下架</button>
+        <!-- 个人中心选项卡 -->
+        <div v-if="activeTab === 'profile'">
+          <div class="avatar-upload">
+            <h2>上传崭新的头像吧！</h2>
+            <input type="file" id="avatar-image" ref="avatarImage" @change="handleAvatarUpload" />
+            <button @click="submitAvatar">提交</button>
           </div>
         </div>
-      <div v-else>
-        <p>您还没有上架任何商品。</p>
-      </div>
-    </div>
 
-      <div v-if="activeTab === 'orders'">
-        <h2>我的订单</h2>
-        <p>这里是我的订单的内容。</p>
-      </div>
-
-      <div v-if="activeTab === 'addProduct'">
-        <div class ="addform">
-        <h2>上架商品</h2>
-        <form @submit.prevent="addProduct">
-          <div class="form-group">
-            <label for="image">上传商品图片：</label>
-            <input type="file" id="image" ref="image" @change="handleImageUpload" />
-          </div>
-          <div class="form-group">
-            <label for="name">商品名称：</label>
-            <input type="text" id="name" v-model="newProduct.name" required />
-          </div>
-
-          <div class="form-container">
-            <div class="form-group-price">
-              <label for="price">出售价格：</label>
-              <input type="number" id="price" v-model="newProduct.price" required />
-            </div>
-            <div class="form-group-price">
-              <label for="price">出租价格：</label>
-              <input type="number" id="price" v-model="newProduct.rental_price" required />
+        <!-- 我的收藏选项卡 -->
+        <div v-if="activeTab === 'favorites'">
+          <h2>我的收藏</h2>
+          <div v-if="favoriteProducts.length > 0" class="product-list">
+            <div
+              v-for="product in favoriteProducts"
+              :key="product.id"
+              class="product-item"
+              @click="goToProductPage(product.id)"
+            >
+              <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
+              <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p>价格：￥{{ product.price }}</p>
+                <p>库存：{{ product.stock }}</p>
+              </div>
+              <button @click.stop="removeFromFavorites(product.id)" class="remove-button">移除收藏</button>
             </div>
           </div>
+          <div v-else>
+            <p>您还没有收藏任何商品。</p>
+          </div>
+        </div>
 
-          <div class="form-container">
-            <div class="form-group-price">
-              <label for="stock">出售库存：</label>
-              <input type="number" id="stock" v-model="newProduct.stock" required />
+        <!-- 我的商品选项卡 -->
+        <div v-if="activeTab === 'products'">
+          <h2>我的商品</h2>
+            <div v-if="products.length > 0" class="product-list">
+              <div v-for="product in products" :key="product.id" class="product-item" @click="goToProductPage(product.id)">
+                <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
+                <div class="product-info">
+                  <h3>{{ product.name }}</h3>
+                  <p>价格：￥{{ product.price }}</p>
+                  <p>库存：{{ product.stock }}</p>
+                </div>
+                <div class="Stock-input" @click.stop>
+                <!-- 添加库存数量输入框 -->
+                <input 
+                  type="number" 
+                  v-model="product.addStocks" 
+                  min="1" 
+                  placeholder="补充库存数量" 
+                />
+                <!-- 减少库存数量输入框 -->
+                <input 
+                  type="number" 
+                  v-model="product.lessStocks" 
+                  min="1" 
+                  placeholder="减少库存数量" 
+                />
+              </div>
+              <div class="buttonInput" >
+                <!-- 补充库存按钮 -->
+                <button @click.stop="addStock(product.id, product.addStocks)" class="Stock-button">补充库存</button>
+                <!-- 减少库存按钮 -->
+                <button @click.stop="lessStock(product.id, product.lessStocks)" class="Stock-button">减少库存</button>
+              </div>
+                
+                <button @click.stop="removeProduct(product.id)" class="remove-button">下架</button>
+              </div>
             </div>
-            <div class="form-group-price">
-              <label for="stock">出租库存：</label>
-              <input type="number" id="stock" v-model="newProduct.rental_stock" required />
+          <div v-else>
+            <p>您还没有上架任何商品。</p>
+          </div>
+        </div>
+
+        <!-- 消费订单选项卡 -->
+        <div v-if="activeTab === 'consumerOrders'">
+          <h2>消费订单</h2>
+
+          <!-- 筛选框 -->
+          <div class="filters">
+            <label for="orderType">订单类型：</label>
+            <select id="orderType" v-model="filters.orderType">
+              <option value="">全部</option>
+              <option value="PURCHASE">购买订单</option>
+              <option value="RENTAL">租借订单</option>
+            </select>
+
+            <label for="orderStatus">订单状态：</label>
+            <select id="orderStatus" v-model="filters.orderStatus">
+              <option value="">全部</option>
+              <option value="PENDING">待支付</option>
+              <option value="PAID">已支付</option>
+              <option value="SHIPPED">已发货</option>
+              <option value="DELIVERED">已收货</option>
+              <option value="CANCELLED">已取消</option>
+              <option value="RETURNED">已回货</option>
+              <option value="MERCHANT_CONFIRMED">商家确认</option>
+            </select>
+
+            <button @click="applyFilters" class="filter-button">筛选</button>
+          </div>
+
+
+          <!-- 订单列表 -->
+          <div v-if="consumerOrders.length > 0" class="order-list">
+            <div
+              v-for="order in consumerOrders"
+              :key="order.id"
+              class="order-item"
+            >
+              <div class="order-info">
+                <h3>订单编号：{{ order.id }}</h3>
+                <p>商品编号：{{ order.productId }}</p>
+                <p>购买数量：{{ order.quantity }}</p>
+                <p>总价：￥{{ order.totalPrice }}</p>
+                <p>状态：{{ order.orderStatus }}</p>
+                <p>地址：{{ order.address }}</p>
+                <p>创建时间：{{ order.createdAt }}</p>
+              </div>
             </div>
           </div>
-          <div class="form-group">
-              <label for="description">商品描述：</label>
-              <textarea id="description" v-model="newProduct.description" required></textarea>
+          <div v-else>
+            <p>您还没有任何消费订单。</p>
           </div>
+        </div>
 
-          <button type="submit" class="add-button">上架商品</button>
-        </form>
-      </div>
+        <!-- 店铺订单选项卡 -->
+        <div v-if="activeTab === 'storeOrders'">
+          <h2>店铺订单</h2>
+          <p>这里是店铺订单的内容。</p>
+        </div>
+
+        <!-- 上架商品选项卡 -->
+        <div v-if="activeTab === 'addProduct'">
+          <div class ="addform">
+          <h2>上架商品</h2>
+          <form @submit.prevent="addProduct">
+            <div class="form-group">
+              <label for="image">上传商品图片：</label>
+              <input type="file" id="image" ref="image" @change="handleImageUpload" />
+            </div>
+            <div class="form-group">
+              <label for="name">商品名称：</label>
+              <input type="text" id="name" v-model="newProduct.name" required />
+            </div>
+
+            <div class="form-container">
+              <div class="form-group-price">
+                <label for="price">出售价格：</label>
+                <input type="number" id="price" v-model="newProduct.price" required />
+              </div>
+              <div class="form-group-price">
+                <label for="price">出租价格：</label>
+                <input type="number" id="price" v-model="newProduct.rental_price" required />
+              </div>
+            </div>
+
+            <div class="form-container">
+              <div class="form-group-price">
+                <label for="stock">出售库存：</label>
+                <input type="number" id="stock" v-model="newProduct.stock" required />
+              </div>
+              <div class="form-group-price">
+                <label for="stock">出租库存：</label>
+                <input type="number" id="stock" v-model="newProduct.rental_stock" required />
+              </div>
+            </div>
+            <div class="form-group">
+                <label for="description">商品描述：</label>
+                <textarea id="description" v-model="newProduct.description" required></textarea>
+            </div>
+
+            <button type="submit" class="add-button">上架商品</button>
+          </form>
+        </div>
+
+
       </div>
     </div>
   </div>
@@ -165,6 +227,11 @@ export default {
         description: "",
         imageUrl: "",
       },
+      consumerOrders: [], // 存储消费订单
+      filters: {
+        orderType: "", // 订单类型：PURCHASE 或 RENTAL
+        orderStatus: "", // 订单状态：OrderStatus 枚举值
+      },
     };
   },
   methods: {
@@ -174,8 +241,10 @@ export default {
         this.fetchProducts(); // 点击"我的商品"时获取商品数据
       } else if (tab === "favorites") {
         this.fetchFavorites(); // 点击"我的收藏"时获取收藏商品数据
-      }
-    },
+      } else if (tab === "consumerOrders") {
+          this.fetchConsumerOrders(); // 点击消费订单时加载数据
+        }
+      },
     // 获取收藏商品数据
     async fetchFavorites() {
       try {
@@ -440,6 +509,59 @@ export default {
         alert("获取用户信息失败，请稍后再试");
       }
     },
+
+      async fetchConsumerOrders() {
+        try {
+          const response = await axios.get("/api/orders/filter", {
+            params: {
+              userId: this.user.id,
+            },
+          });
+          if (response.status === 200) {
+            this.consumerOrders = response.data;
+          } else {
+            alert("获取消费订单失败！");
+          }
+        } catch (error) {
+          console.error("获取消费订单时出错：", error);
+          alert("获取消费订单时出错，请稍后再试！");
+        }
+    },
+
+      async applyFilters() {
+        try {
+          const response = await axios.get("/api/orders/filter", {
+            params: {
+              userId: this.user.id,
+              orderType: this.filters.orderType || null,
+              orderStatus: this.filters.orderStatus || null,
+            },
+          });
+          if (response.status === 200) {
+            this.consumerOrders = response.data;
+          } else {
+            alert("筛选订单失败！");
+          }
+        } catch (error) {
+          console.error("筛选订单时出错：", error);
+          alert("筛选订单时出错，请稍后再试！");
+        }
+      },
+
+
+    
+    // 默认店铺订单的处理函数
+    handleStoreOrders() {
+      console.log("店铺订单处理函数调用");
+      alert("店铺订单的功能尚未实现");
+    },
+
+
+
+
+
+
+
     goBack() {
         // 返回上一页
         // this.$router.go(-1);
@@ -783,4 +905,60 @@ button:hover {
     resize: vertical;
     min-height: 100px;
   }
+
+  .order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .order-item {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .order-item .order-info h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .order-item .order-info p {
+    font-size: 14px;
+    margin: 5px 0;
+  }
+
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .filters label {
+    font-weight: bold;
+  }
+
+  .filters select {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .filter-button {
+    background-color: #6a2af5;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+  }
+
+  .filter-button:hover {
+    background-color: #04fffb;
+  }
+
+
 </style>

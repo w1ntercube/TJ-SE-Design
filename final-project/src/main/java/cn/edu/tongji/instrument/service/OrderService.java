@@ -49,32 +49,37 @@ public class OrderService {
         return orderRepository.findByUserId(userId);
     }
 
-    // 根据用户ID和可选条件（订单类型和状态）筛选订单
     public List<Order> getOrdersByUserAndFilters(Long userId, String orderType, OrderStatus orderStatus) {
-        if (orderStatus == null && orderType == null) {
-            return new ArrayList<>(orderRepository.findByUserId(userId));
+        List<Order> orders = new ArrayList<>();
+
+        if (orderType == null && orderStatus == null) {
+            // 如果种类和状态都为 null，查询所有订单
+            orders.addAll(purchaseOrderRepository.findByUserId(userId));
+            orders.addAll(rentalOrderRepository.findByUserId(userId));
+        } else if (orderType == null) {
+            // 如果只指定了状态，则查询所有类型的订单中匹配状态的订单
+            orders.addAll(purchaseOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus));
+            orders.addAll(rentalOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus));
         } else if ("PURCHASE".equalsIgnoreCase(orderType)) {
-            // 查询购买订单
+            // 如果指定了购买订单
             if (orderStatus != null) {
-                return new ArrayList<>(purchaseOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus));
+                orders.addAll(purchaseOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus));
             } else {
-                return new ArrayList<>(purchaseOrderRepository.findByUserId(userId));
+                orders.addAll(purchaseOrderRepository.findByUserId(userId));
             }
         } else if ("RENTAL".equalsIgnoreCase(orderType)) {
-            // 查询租赁订单
+            // 如果指定了租赁订单
             if (orderStatus != null) {
-                return new ArrayList<>(rentalOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus));
+                orders.addAll(rentalOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus));
             } else {
-                return new ArrayList<>(rentalOrderRepository.findByUserId(userId));
+                orders.addAll(rentalOrderRepository.findByUserId(userId));
             }
-        } else if (orderType == null) {
-            // 如果 orderType 为 null，需要同时查询两类订单并合并
-            List<Order> orders = new ArrayList<>(purchaseOrderRepository.findByUserId(userId));
-            orders.addAll(rentalOrderRepository.findByUserId(userId));
-            return orders;
         } else {
             throw new IllegalArgumentException("Unsupported order type: " + orderType);
         }
+
+        return orders;
     }
+
 
 }
