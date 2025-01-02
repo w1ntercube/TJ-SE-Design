@@ -8,6 +8,7 @@ import cn.edu.tongji.instrument.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,22 +32,26 @@ public class UserController {
     // 登录接口
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        User user = userService.findByUsername(loginRequest.getUsername());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户不存在");
-        }
-        if (!user.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("密码错误");
-        }
+        try {
+            // 验证用户名和密码
+            boolean isValid = userService.validateUserLogin(loginRequest.getUsername(), loginRequest.getPassword());
+            if (!isValid) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户名或密码错误");
+            }
 
-        // 如果用户被封禁
-        if (user.getIsBanned() != null && user.getIsBanned()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("账户已被封禁");
+            User user = userService.findByUsername(loginRequest.getUsername());
+
+            // 如果用户被封禁
+            if (Boolean.TRUE.equals(user.getIsBanned())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("账户已被封禁");
+            }
+
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("服务器错误：" + e.getMessage());
         }
-        return ResponseEntity.ok(user); // 登录成功返回用户信息
     }
 
-    //修改密码接口
     // 修改密码接口
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
@@ -57,16 +62,18 @@ public class UserController {
         }
 
         // 2. 验证原密码是否正确
-        if (!user.getPassword().equals(changePasswordRequest.getOldPassword())) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("原密码错误");
         }
 
-        // 3. 更新密码
-        user.setPassword(changePasswordRequest.getNewPassword());
-        userService.updateUser(user.getId(), user); // 假设 updateUser 方法支持修改密码
+        // 3. 加密新密码并更新
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userService.updateUser(user.getId(), user);
 
         return ResponseEntity.ok("密码修改成功");
     }
+
 
     // 查询所有用户
     @GetMapping

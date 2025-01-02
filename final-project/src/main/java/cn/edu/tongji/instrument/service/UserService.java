@@ -2,6 +2,7 @@ package cn.edu.tongji.instrument.service;
 import cn.edu.tongji.instrument.entity.User;
 import cn.edu.tongji.instrument.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +13,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     // 新增用户
     public User createUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -31,7 +35,13 @@ public class UserService {
     public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(user -> {
             user.setUsername(updatedUser.getUsername());
-            user.setPassword(updatedUser.getPassword());
+
+            // 如果密码字段更新了，重新加密密码
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty() &&
+                    !new BCryptPasswordEncoder().matches(updatedUser.getPassword(), user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            }
+
             user.setPhone(updatedUser.getPhone());
             user.setAvatarUrl(updatedUser.getAvatarUrl());
             user.setReputationScore(updatedUser.getReputationScore());
@@ -39,6 +49,7 @@ public class UserService {
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("用户未找到"));
     }
+
 
     // 更新用户信息，根据用户名
     public User updateUserByUsername(String username, User updatedUser) {
@@ -48,7 +59,9 @@ public class UserService {
         }
         // 更新用户信息
         user.setUsername(updatedUser.getUsername());
-        user.setPassword(updatedUser.getPassword());
+        if (!user.getPassword().equals(updatedUser.getPassword())) {
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
         user.setPhone(updatedUser.getPhone());
         user.setAvatarUrl(updatedUser.getAvatarUrl());
         user.setReputationScore(updatedUser.getReputationScore());
@@ -65,5 +78,17 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    // 校验用户登录（校验用户名和密码是否匹配）
+    public boolean validateUserLogin(String username, String rawPassword) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        // 校验密码是否匹配
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+
 }
 
