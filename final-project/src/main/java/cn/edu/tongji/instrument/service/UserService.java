@@ -108,6 +108,7 @@ public class UserService {
         // 设置新密码
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
 
     //封禁用户
     public User banUser(Long id)
