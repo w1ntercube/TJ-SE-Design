@@ -108,18 +108,33 @@
             <label for="name">商品名称：</label>
             <input type="text" id="name" v-model="newProduct.name" required />
           </div>
-          <div class="form-group">
-            <label for="price">价格：</label>
-            <input type="number" id="price" v-model="newProduct.price" required />
+
+          <div class="form-container">
+            <div class="form-group-price">
+              <label for="price">出售价格：</label>
+              <input type="number" id="price" v-model="newProduct.price" required />
+            </div>
+            <div class="form-group-price">
+              <label for="price">出租价格：</label>
+              <input type="number" id="price" v-model="newProduct.rental_price" required />
+            </div>
+          </div>
+
+          <div class="form-container">
+            <div class="form-group-price">
+              <label for="stock">出售库存：</label>
+              <input type="number" id="stock" v-model="newProduct.stock" required />
+            </div>
+            <div class="form-group-price">
+              <label for="stock">出租库存：</label>
+              <input type="number" id="stock" v-model="newProduct.rental_stock" required />
+            </div>
           </div>
           <div class="form-group">
-            <label for="stock">库存：</label>
-            <input type="number" id="stock" v-model="newProduct.stock" required />
+              <label for="description">商品描述：</label>
+              <textarea id="description" v-model="newProduct.description" required></textarea>
           </div>
-          <div class="form-group">
-            <label for="description">商品描述：</label>
-            <textarea id="description" v-model="newProduct.description" required></textarea>
-          </div>
+
           <button type="submit" class="add-button">上架商品</button>
         </form>
       </div>
@@ -340,15 +355,20 @@ export default {
 
     // 上架商品
     async addProduct() {
-      if (this.newProduct.name && this.newProduct.price && this.newProduct.stock && this.newProduct.description && this.newProduct.imageUrl) {
+      if (this.newProduct.name && this.newProduct.price && this.newProduct.rental_price 
+          && this.newProduct.stock && this.newProduct.rental_stock 
+          && this.newProduct.description && this.newProduct.imageUrl) {
         const formData = new FormData();
 
         // 添加商品信息到 FormData
         formData.append("name", this.newProduct.name);
         formData.append("price", this.newProduct.price);
+        formData.append("rental_price", this.newProduct.rental_price);
         formData.append("stock", this.newProduct.stock);
+        formData.append("rental_stock", this.newProduct.rental_stock);
         formData.append("description", this.newProduct.description);
-        formData.append("seller_name", this.user.username);  // 传递卖家名称（假设已存储在 user 中）
+        formData.append("seller_id", this.user.id); 
+        formData.append("is_active", 1); 
 
         // 添加图片到 FormData
         const file = this.$refs.image.files[0]; // 使用 ref 获取文件
@@ -389,6 +409,8 @@ export default {
         name: "",
         price: 0,
         stock: 0,
+        rental_price: 0,
+        rental_stock: 0,
         description: "",
         imageUrl: "",
       };
@@ -716,6 +738,35 @@ button:hover {
     margin-bottom: 15px;
     width:80%;
   }
+
+  .form-container {
+    display: flex; /* 水平排列 */
+    gap: 20px; /* 子元素之间的间距 */
+  }
+
+  .form-group-price {
+    flex: 1; /* 每个子元素占一半宽度 */
+    display: flex;
+    flex-direction: column; /* 垂直排列子元素 */
+    justify-content: center;
+    margin-left: 20px; /* 左边距 */
+    margin-right: 20px;
+  }
+
+  .form-group input {
+    width: 70%; /* 输入框占满父容器宽度 */
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* 确保 padding 不影响宽度 */
+  }
+
+  .form-group label {
+    margin-bottom: 5px; /* 标签与输入框之间的间距 */
+    font-weight: bold; /* 加粗标签 */
+  }
+
   
   input[type="text"],
   input[type="number"],
