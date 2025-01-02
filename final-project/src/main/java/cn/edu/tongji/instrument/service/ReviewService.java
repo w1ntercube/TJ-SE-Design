@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,5 +67,13 @@ public class ReviewService {
                 .orElse("Default-avatar");
         // 将实体转换回 DTO 并返回
         return new ReviewDTO(savedReview, username, avatarUrl);
+    }
+
+    public Optional<Review> findByReviewIdAndUserId(Long reviewId, Long userId) {
+        return reviewRepository.findByIdAndUserId(reviewId, userId);
+    }
+
+    public void delete(Long reviewId) {
+        reviewRepository.deleteById(reviewId);
     }
 }

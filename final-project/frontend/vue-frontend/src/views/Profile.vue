@@ -60,6 +60,29 @@
               <p>价格：￥{{ product.price }}</p>
               <p>库存：{{ product.stock }}</p>
             </div>
+            <div class="Stock-input" @click.stop>
+            <!-- 添加库存数量输入框 -->
+            <input 
+              type="number" 
+              v-model="product.addStocks" 
+              min="1" 
+              placeholder="补充库存数量" 
+            />
+            <!-- 减少库存数量输入框 -->
+            <input 
+              type="number" 
+              v-model="product.lessStocks" 
+              min="1" 
+              placeholder="减少库存数量" 
+            />
+          </div>
+          <div class="buttonInput" >
+            <!-- 补充库存按钮 -->
+            <button @click.stop="addStock(product.id, product.addStocks)" class="Stock-button">补充库存</button>
+            <!-- 减少库存按钮 -->
+            <button @click.stop="lessStock(product.id, product.lessStocks)" class="Stock-button">减少库存</button>
+          </div>
+            
             <button @click.stop="removeProduct(product.id)" class="remove-button">下架</button>
           </div>
         </div>
@@ -217,7 +240,54 @@ export default {
         alert("删除商品失败");
       }
     },
-
+    // 增加库存
+    async addStock(productId, quantity) {
+      try {
+        console.log(productId, quantity);
+        const response = await axios.post(`/api/products/addStock`, {
+          productId: productId,
+          quantity: quantity
+        });
+        if (response.status === 200) {
+          const updatedProduct = response.data;
+          this.products = this.products.map(product =>
+            product.id === productId ? updatedProduct : product
+          ); // 更新产品列表中的库存信息
+          alert("库存已增加");
+          this.fetchProducts();
+          this.setActiveTab('products');
+        } else {
+          alert("增加库存失败");
+        }
+      } catch (error) {
+        console.error("增加库存时出错", error);
+        alert("增加库存失败");
+      }
+    },
+    // 减少库存
+    async lessStock(productId, quantity) {
+      try {
+        console.log(productId, quantity);
+        const response = await axios.post(`/api/products/lessStock`, {
+          productId: productId,
+          quantity: quantity
+        });
+        if (response.status === 200) {
+          const updatedProduct = response.data;
+          this.products = this.products.map(product =>
+            product.id === productId ? updatedProduct : product
+          ); // 更新产品列表中的库存信息
+          alert("库存已减少");
+          this.fetchProducts();
+          this.setActiveTab('products');
+        } else {
+          alert("减少库存失败");
+        }
+      } catch (error) {
+        console.error("减少库存时出错", error);
+        alert("减少库存失败");
+      }
+    },
 
 
      // 用于存储选择的头像文件
@@ -548,6 +618,47 @@ button:hover {
     color: #080808;
   }
   
+  /* Stock-input 样式 */
+  .Stock-input {
+    display: flex;
+    flex-direction: column; /* 垂直排列 */
+    justify-content: center; /* 内容在容器中间 */
+    gap: 10px; /* 控制输入框之间的间距 */
+  }
+
+  /* 输入框通用样式 */
+  .Stock-input input {
+    width: 100%; /* 占满父容器宽度 */
+    padding: 20px; /* 增加内边距 */
+    font-size: 16px; /* 调整字体大小 */
+    border: 1px solid #ccc; /* 边框样式 */
+    border-radius: 5px; /* 圆角 */
+    box-sizing: border-box; /* 包括内边距 */
+  }
+
+  /* buttonInput 样式 */
+  .buttonInput {
+    display: flex;
+    flex-direction: column; /* 垂直排列 */
+    justify-content: center; /* 内容在容器中间 */
+    gap: 10px; /* 控制按钮之间的间距 */
+  }
+
+  .product-item .Stock-button {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+    width: 100px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+  }
+  .product-item .Stock-button:hover {
+    background-color: #22f2f5;
+  }
+  
   .product-item .remove-button {
     background-color: #ff4d4f;
     color: white;
@@ -557,6 +668,7 @@ button:hover {
     width: 100px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-right: 10px;
   }
   
   .product-item .remove-button:hover {

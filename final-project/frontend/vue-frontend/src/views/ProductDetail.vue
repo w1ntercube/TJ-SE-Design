@@ -42,6 +42,7 @@
               <img :src="review.avatarUrl" alt="用户头像" class="user-avatar" />
               <h4 class="comment-username">{{ review.username }}</h4>
               <span class="comment-rating">评分：({{ review.rating }}⭐)</span>
+              <button class="delete-comment-button" @click="deleteComment(review.id)">删除</button>
             </div>
             <p class="comment-content">{{ review.comment }}</p>
             <div class="comment-bottom">
@@ -77,7 +78,7 @@
   
   <script>
   import axios from "axios";
-
+  
   export default {
     name: "ProductDetail",
     data() {
@@ -91,19 +92,6 @@
           rating: 5,
         },
         isLoading: true, // 是否正在加载数据
-        // reviews: [
-        //   // 您可以在组件创建或请求后端接口获取评论列表
-        //   { id: 1, username: "Alice", rating: 5, comment: "这个商品不错，物美价廉！", created_at: "2024-07-01" },
-        //   { id: 2, username: "Bob", rating: 4, comment: "价格实惠，值得购买！", created_at: "2024-07-02" },
-        //   { id: 3, username: "Charlie", rating: 3, comment: "一般般，不太满意。", created_at: "2024-07-03" },
-        //   { id: 4, username: "Alice", rating: 5, comment: "这个商品不错，物美价廉！", created_at: "2024-07-01" },
-        //   { id: 5, username: "Bob", rating: 4, comment: "价格实惠，值得购买！", created_at: "2024-07-02" },
-        //   { id: 6, username: "Charlie", rating: 3, comment: "一般般，不太满意。", created_at: "2024-07-03" },
-        //   { id: 7, username: "Alice", rating: 5, comment: "这个商品不错，物美价廉！", created_at: "2024-07-01" },
-        //   { id: 8, username: "Bob", rating: 4, comment: "价格实惠，值得购买！", created_at: "2024-07-02" },
-        //   { id: 9, username: "Charlie", rating: 3, comment: "一般般，不太满意。", created_at: "2024-07-03" },
-        //   { id: 10, username: "Charlie", rating: 3, comment: "一般般，不太满意。", created_at: "2024-07-03" },
-        // ],
         
       };
     },
@@ -226,7 +214,7 @@
         }
 
         axios
-          .post(`/api/reviews`, newReviewData)
+          .post(`/api/reviews/add`, newReviewData)
           .then((response) => {
             alert("评论提交成功！");
             // 将新评论添加到评论列表中（无需刷新页面）
@@ -234,12 +222,67 @@
             // 清空评论表单
             this.newReview.comment = "";
             this.newReview.rating = 5;
+            window.location.reload();
           })
           .catch((error) => {
             console.error("评论提交失败:", error);
             alert("评论提交失败，请稍后重试！");
           });
         },
+        // 删除评论
+        async deleteComment(commentId) {
+          if (!confirm("确定要删除这条评论吗？")) {
+            return; // 如果用户取消操作，直接退出
+          }
+
+          try {
+            // 获取本地用户信息
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+
+            if (!storedUser || !storedUser.id) {
+              alert("用户未登录，请先登录！");
+              return;
+            }
+
+            const userId = storedUser.id;
+
+            // 向后端发送删除请求，包含 userId 和 commentId
+            const response = await axios.post(`/api/reviews/delete`, {
+              userId: userId,
+              reviewId: commentId,
+            });
+
+            if (response.status === 200) {
+              // 从评论列表中移除已删除的评论
+              this.reviews = this.reviews.filter(comment => comment.id !== commentId);
+              alert("评论已成功删除");
+              window.location.reload();
+            } else {
+              alert("删除评论失败，请稍后再试");
+            }
+          } catch (error) {
+              console.error("完整错误信息: ", error);
+
+              if (error.response) {
+                console.log("错误响应信息: ", error.response);
+                const status = error.response.status;
+
+                if (status === 401) {
+                  alert("未授权，请重新登录！");
+                } else if (status === 404) {
+                  alert("评论不存在或已被删除！");
+                } else {
+                  alert("删除评论失败，请稍后再试！");
+                }
+              } else {
+                console.error("删除评论时出错，可能是网络问题: ", error);
+                alert("网络错误，请稍后再试！");
+              }
+            }
+
+        },
+
+
       async handleBuy() { 
         try {
           // 请求参数
@@ -467,10 +510,11 @@
     }
 
     /* 头部区域：左侧用户名 + 右侧评分 */
-    .right-box .comment-header {
+    .comment-header {
       display: flex;
       align-items: center; /* 头像与用户名垂直居中 */
       gap: 5px; /* 控制头像与名字之间的间距 */
+      position: relative; /* 为了绝对定位按钮 */
     }
     .user-avatar {
       width: 40px; /* 调整头像宽度 */
@@ -643,7 +687,20 @@
       transform: scale(1.05);               /* 悬停时略微放大 */
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* 悬停时加深阴影 */
     }
+    .delete-comment-button {
+      background-color: transparent; /* 背景透明 */
+      color: red; /* 删除按钮颜色 */
+      border: none; /* 去掉边框 */
+      font-size: 14px; /* 调整字体大小 */
+      cursor: pointer; /* 鼠标变为手型 */
+      top: 0; /* 距离顶部对齐 */
+      position: absolute; /* 绝对定位 */
+      right: 10px; /* 距离右侧对齐 */
+    }
 
+    .delete-comment-button:hover {
+      color: darkred; /* 悬停时颜色变化 */
+    }
 
   </style>
   

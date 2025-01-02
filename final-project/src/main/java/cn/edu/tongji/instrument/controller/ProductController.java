@@ -152,6 +152,47 @@ public class ProductController {
         List<Product> products = productService.getProductsBySeller(seller);
         return ResponseEntity.ok(products);  // 返回商品列表
     }
+    // 增加库存
+    @PostMapping("/addStock")
+    public ResponseEntity<String> addStock(@RequestBody Map<String, Object> request) {
+        Long productId = ((Number) request.get("productId")).longValue();
+        Integer quantity = ((Number) request.get("quantity")).intValue();
+
+        Optional<Product> productOptional = productService.getProductById(productId);
+        if (productOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Product not found");
+        }
+
+        Product product = productOptional.get();
+        product.setStock(product.getStock() + quantity); // 增加库存
+        productService.updateProduct(product);
+
+        return ResponseEntity.ok("Stock updated successfully");
+    }
+    // 减少库存
+    @PostMapping("/lessStock")
+    public ResponseEntity<String> lessStock(@RequestBody Map<String, Object> request) {
+        Long productId = ((Number) request.get("productId")).longValue();
+        Integer quantity = ((Number) request.get("quantity")).intValue();
+
+        Optional<Product> productOptional = productService.getProductById(productId);
+        if (productOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Product not found");
+        }
+
+        Product product = productOptional.get();
+        int currentStock = product.getStock();
+        // 判断库存减少量是否大于当前库存
+        if (quantity > currentStock) {
+            return ResponseEntity.status(400).body("Insufficient stock to reduce by " + quantity);
+        }
+
+        // 减少库存
+        product.setStock(currentStock - quantity);
+        productService.updateProduct(product);
+
+        return ResponseEntity.ok("Stock updated successfully");
+    }
 }
 
 
