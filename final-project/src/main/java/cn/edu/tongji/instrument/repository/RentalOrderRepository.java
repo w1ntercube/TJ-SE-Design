@@ -14,4 +14,8 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
 
     // 查询某用户的特定状态的租赁订单
     List<RentalOrder> findByUserIdAndOrderStatus(Long userId, OrderStatus orderStatus);
+
+    List<RentalOrder> findByProductIdIn(List<Long> productIds);
+    List<RentalOrder> findByProductIdInAndOrderStatus(List<Long> productIds, OrderStatus orderStatus);
+
 }

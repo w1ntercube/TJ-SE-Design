@@ -19,12 +19,14 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private PurchaseOrderRepository purchaseOrderRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
+    private final RentalOrderRepository rentalOrderRepository;
 
-    @Autowired
-    private RentalOrderRepository rentalOrderRepository;
-
+    public OrderService(PurchaseOrderRepository purchaseOrderRepository,
+                        RentalOrderRepository rentalOrderRepository) {
+        this.purchaseOrderRepository = purchaseOrderRepository;
+        this.rentalOrderRepository = rentalOrderRepository;
+    }
 
     // 查询所有订单
     public List<Order> getAllOrders() {
@@ -81,5 +83,28 @@ public class OrderService {
         return orders;
     }
 
+    // 根据商品ID列表和筛选条件查询订单
+    public List<Order> getOrdersByProductIdsAndFilters(List<Long> productIds, String orderType, OrderStatus orderStatus) {
+        List<Order> orders = new ArrayList<>();
 
+        if (orderType == null || "PURCHASE".equalsIgnoreCase(orderType)) {
+            // 查询购买订单
+            if (orderStatus != null) {
+                orders.addAll(purchaseOrderRepository.findByProductIdInAndOrderStatus(productIds, orderStatus));
+            } else {
+                orders.addAll(purchaseOrderRepository.findByProductIdIn(productIds));
+            }
+        }
+
+        if (orderType == null || "RENTAL".equalsIgnoreCase(orderType)) {
+            // 查询租赁订单
+            if (orderStatus != null) {
+                orders.addAll(rentalOrderRepository.findByProductIdInAndOrderStatus(productIds, orderStatus));
+            } else {
+                orders.addAll(rentalOrderRepository.findByProductIdIn(productIds));
+            }
+        }
+
+        return orders;
+    }
 }

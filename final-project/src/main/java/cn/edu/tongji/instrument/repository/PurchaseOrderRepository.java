@@ -15,4 +15,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
     // 查询某用户的特定状态的购买订单
     List<PurchaseOrder> findByUserIdAndOrderStatus(Long userId, OrderStatus orderStatus);
 
+    List<PurchaseOrder> findByProductIdIn(List<Long> productIds);
+    List<PurchaseOrder> findByProductIdInAndOrderStatus(List<Long> productIds, OrderStatus orderStatus);
+
 }

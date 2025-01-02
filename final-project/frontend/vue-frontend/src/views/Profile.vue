@@ -98,43 +98,39 @@
           </div>
         </div>
 
-        <!-- 消费订单选项卡 -->
-        <div v-if="activeTab === 'consumerOrders'">
-          <h2>消费订单</h2>
 
-          <!-- 筛选框 -->
-          <div class="filters">
-            <label for="orderType">订单类型：</label>
-            <select id="orderType" v-model="filters.orderType">
-              <option value="">全部</option>
-              <option value="PURCHASE">购买订单</option>
-              <option value="RENTAL">租借订单</option>
-            </select>
+        <div>
+          <!-- 消费订单选项卡 -->
+          <div v-if="activeTab === 'consumerOrders'" class="order-section">
+            <h2>消费订单</h2>
 
-            <label for="orderStatus">订单状态：</label>
-            <select id="orderStatus" v-model="filters.orderStatus">
-              <option value="">全部</option>
-              <option value="PENDING">待支付</option>
-              <option value="PAID">已支付</option>
-              <option value="SHIPPED">已发货</option>
-              <option value="DELIVERED">已收货</option>
-              <option value="CANCELLED">已取消</option>
-              <option value="RETURNED">已回货</option>
-              <option value="MERCHANT_CONFIRMED">商家确认</option>
-            </select>
+            <!-- 筛选框 -->
+            <div class="filters">
+              <label for="consumerOrderType">订单类型：</label>
+              <select id="consumerOrderType" v-model="filters.orderType" class="filter-select">
+                <option value="">全部</option>
+                <option value="PURCHASE">购买订单</option>
+                <option value="RENTAL">租借订单</option>
+              </select>
 
-            <button @click="applyFilters" class="filter-button">筛选</button>
-          </div>
+              <label for="consumerOrderStatus">订单状态：</label>
+              <select id="consumerOrderStatus" v-model="filters.orderStatus" class="filter-select">
+                <option value="">全部</option>
+                <option value="PENDING">待支付</option>
+                <option value="PAID">已支付</option>
+                <option value="SHIPPED">已发货</option>
+                <option value="DELIVERED">已收货</option>
+                <option value="CANCELLED">已取消</option>
+                <option value="RETURNED">已回货</option>
+                <option value="MERCHANT_CONFIRMED">商家确认</option>
+              </select>
 
+              <button @click="applyFilters" class="filter-button">筛选</button>
+            </div>
 
-          <!-- 订单列表 -->
-          <div v-if="consumerOrders.length > 0" class="order-list">
-            <div
-              v-for="order in consumerOrders"
-              :key="order.id"
-              class="order-item"
-            >
-              <div class="order-info">
+            <!-- 订单列表 -->
+            <div v-if="consumerOrders.length > 0" class="order-list">
+              <div v-for="order in consumerOrders" :key="order.id" class="order-item">
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId }}</p>
                 <p>购买数量：{{ order.quantity }}</p>
@@ -144,17 +140,57 @@
                 <p>创建时间：{{ order.createdAt }}</p>
               </div>
             </div>
+            <div v-else>
+              <p>您还没有任何消费订单。</p>
+            </div>
           </div>
-          <div v-else>
-            <p>您还没有任何消费订单。</p>
+
+          <!-- 店铺订单选项卡 -->
+          <div v-if="activeTab === 'storeOrders'" class="order-section">
+            <h2>店铺订单</h2>
+
+            <!-- 筛选框 -->
+            <div class="filters">
+              <label for="storeOrderType">订单类型：</label>
+              <select id="storeOrderType" v-model="filter.orderType" class="filter-select">
+                <option value="">全部</option>
+                <option value="PURCHASE">购买订单</option>
+                <option value="RENTAL">租赁订单</option>
+              </select>
+
+              <label for="storeOrderStatus">订单状态：</label>
+              <select id="storeOrderStatus" v-model="filter.orderStatus" class="filter-select">
+                <option value="">全部</option>
+                <option v-for="status in orderStatusOptions" :key="status" :value="status">
+                  {{ status }}
+                </option>
+              </select>
+
+              <button @click="fetchSellerOrders" class="filter-button">筛选</button>
+            </div>
+
+            <!-- 店铺订单列表 -->
+            <div v-if="sellerOrders.length > 0" class="order-list">
+              <div v-for="order in sellerOrders" :key="order.id" class="order-item">
+                <h3>订单编号：{{ order.id }}</h3>
+                <p>商品编号：{{ order.productId || 'N/A' }}</p>
+                <p>订单类型：{{ order.orderType }}</p>
+                <p>购买数量：{{ order.quantity || 'N/A' }}</p>
+                <p>租赁时长：{{ order.rentalDurationDays || 'N/A' }} 天</p>
+                <p>总价：￥{{ order.totalPrice }}</p>
+                <p>状态：{{ order.orderStatus }}</p>
+                <p>地址：{{ order.address }}</p>
+                <p>创建时间：{{ order.createdAt }}</p>
+              </div>
+            </div>
+            <div v-else>
+              <p>暂无店铺订单。</p>
+            </div>
           </div>
         </div>
 
-        <!-- 店铺订单选项卡 -->
-        <div v-if="activeTab === 'storeOrders'">
-          <h2>店铺订单</h2>
-          <p>这里是店铺订单的内容。</p>
-        </div>
+
+
 
         <!-- 上架商品选项卡 -->
         <div v-if="activeTab === 'addProduct'">
@@ -264,9 +300,24 @@ export default {
         imageUrl: "",
       },
       consumerOrders: [], // 存储消费订单
+      sellerOrders: [], // 店铺订单列表
+      orderStatusOptions: [
+        "PENDING",
+        "PAID",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "RETURNED",
+        "MERCHANT_CONFIRMED",
+      ],
       filters: {
-        orderType: "", // 订单类型：PURCHASE 或 RENTAL
-        orderStatus: "", // 订单状态：OrderStatus 枚举值
+        orderType: "", // 消费订单筛选类型
+        orderStatus: "", // 消费订单筛选状态
+      },
+
+      filter: {
+        orderType: "", // 店铺订单筛选类型
+        orderStatus: "", // 店铺订单筛选状态
       },
 
       messages: [], //初始化消息数组
@@ -282,7 +333,9 @@ export default {
         this.fetchFavorites(); // 点击"我的收藏"时获取收藏商品数据
       } else if (tab === "consumerOrders") {
           this.fetchConsumerOrders(); // 点击消费订单时加载数据
-        }
+      } else if (tab === "storeOrders") {
+          this.fetchSellerOrders(); // 点击店铺订单时加载数据
+      }
       },
     // 获取收藏商品数据
     async fetchFavorites() {
@@ -549,7 +602,7 @@ export default {
       }
     },
 
-      async fetchConsumerOrders() {
+    async fetchConsumerOrders() {
         try {
           const response = await axios.get("/api/orders/filter", {
             params: {
@@ -567,33 +620,48 @@ export default {
         }
     },
 
-      async applyFilters() {
-        try {
-          const response = await axios.get("/api/orders/filter", {
-            params: {
-              userId: this.user.id,
-              orderType: this.filters.orderType || null,
-              orderStatus: this.filters.orderStatus || null,
-            },
-          });
-          if (response.status === 200) {
-            this.consumerOrders = response.data;
-          } else {
-            alert("筛选订单失败！");
-          }
-        } catch (error) {
-          console.error("筛选订单时出错：", error);
-          alert("筛选订单时出错，请稍后再试！");
+    async applyFilters() {
+      try {
+        const params = {
+          userId: this.user.id,
+        };
+
+        // 添加筛选条件（仅当不为空时）
+        if (this.filters.orderType) params.orderType = this.filters.orderType;
+        if (this.filters.orderStatus) params.orderStatus = this.filters.orderStatus;
+
+        const response = await axios.get("/api/orders/filter", { params });
+
+        if (response.status === 200) {
+          this.consumerOrders = response.data;
+        } else {
+          alert("筛选订单失败！");
         }
-      },
-
-
-    
-    // 默认店铺订单的处理函数
-    handleStoreOrders() {
-      console.log("店铺订单处理函数调用");
-      alert("店铺订单的功能尚未实现");
+      } catch (error) {
+        console.error("筛选订单时出错：", error);
+        alert("筛选订单时出错，请稍后再试！");
+      }
     },
+
+    async fetchSellerOrders() {
+      try {
+        const params = {
+          sellerId: this.user.id, // 当前用户ID
+        };
+
+        // 添加筛选条件（仅当不为空时）
+        if (this.filter.orderType) params.orderType = this.filter.orderType;
+        if (this.filter.orderStatus) params.orderStatus = this.filter.orderStatus;
+
+        const response = await axios.get("/api/orders/seller/filter", { params });
+        this.sellerOrders = response.data;
+      } catch (error) {
+        console.error("获取店铺订单失败", error);
+        alert("获取店铺订单失败，请稍后再试");
+      }
+    },
+    
+
 
 
 
@@ -969,61 +1037,70 @@ button:hover {
     min-height: 100px;
   }
 
-  .order-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
 
-  .order-item {
-    background-color: #f0f0f0;
-    padding: 15px;
+
+    .order-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
-  .order-item .order-info h3 {
+  .filters {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .filter-select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .filter-button {
+    padding: 8px 12px;
+    background-color: #6a2af5;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .filter-button:hover {
+    background-color: #4c13fa;
+  }
+
+  .order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .order-item {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .order-item h3 {
     font-size: 18px;
     margin-bottom: 10px;
   }
 
-  .order-item .order-info p {
+  .order-item p {
     font-size: 14px;
     margin: 5px 0;
   }
 
-  .filters {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
 
-  .filters label {
-    font-weight: bold;
-  }
-
-  .filters select {
-    padding: 5px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .filter-button {
-    background-color: #6a2af5;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-  }
-
-  .filter-button:hover {
-    background-color: #04fffb;
-  }
-
-
+    
   /* ai界面 */
 .ai-chat-container {
   display: flex;
