@@ -36,9 +36,9 @@ public class UserService {
         return userRepository.findById(id).map(user -> {
             user.setUsername(updatedUser.getUsername());
 
-            // 如果密码字段更新了，重新加密密码
+            // 更新密码时仅在提供新密码的情况下进行更新
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty() &&
-                    !new BCryptPasswordEncoder().matches(updatedUser.getPassword(), user.getPassword())) {
+                    !passwordEncoder.matches(updatedUser.getPassword(), user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
             }
 
@@ -57,16 +57,19 @@ public class UserService {
         if (user == null) {
             throw new RuntimeException("用户不存在");
         }
-        // 更新用户信息
-        user.setUsername(updatedUser.getUsername());
-        if (!user.getPassword().equals(updatedUser.getPassword())) {
+
+        // 更新密码时仅在提供新密码的情况下进行更新
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty() &&
+                !passwordEncoder.matches(updatedUser.getPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
+
+        user.setUsername(updatedUser.getUsername());
         user.setPhone(updatedUser.getPhone());
         user.setAvatarUrl(updatedUser.getAvatarUrl());
         user.setReputationScore(updatedUser.getReputationScore());
         user.setIsBanned(updatedUser.getIsBanned());
-        return userRepository.save(user);  // 保存更新后的用户
+        return userRepository.save(user);
     }
 
     // 删除用户
@@ -89,6 +92,21 @@ public class UserService {
         return passwordEncoder.matches(rawPassword, user.getPassword());
     }
 
+    // 修改用户密码
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
 
+        // 校验原密码
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+
+        // 设置新密码
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }
 

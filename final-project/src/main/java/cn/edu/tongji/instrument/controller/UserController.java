@@ -55,23 +55,18 @@ public class UserController {
     // 修改密码接口
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-        // 1. 验证用户名是否存在
-        User user = userService.findByUsername(changePasswordRequest.getUsername());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户名不存在");
+        try {
+            userService.changePassword(
+                    changePasswordRequest.getUsername(),
+                    changePasswordRequest.getOldPassword(),
+                    changePasswordRequest.getNewPassword()
+            );
+            return ResponseEntity.ok("密码修改成功");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("服务器错误：" + e.getMessage());
         }
-
-        // 2. 验证原密码是否正确
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("原密码错误");
-        }
-
-        // 3. 加密新密码并更新
-        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
-        userService.updateUser(user.getId(), user);
-
-        return ResponseEntity.ok("密码修改成功");
     }
 
 
