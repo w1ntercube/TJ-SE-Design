@@ -87,6 +87,17 @@
             v-model="purchaseDetails.quantity"
             min="1"
             max="product.stock"
+            placeholder="请输入购买数量"
+          />
+
+          <p>总价格：<span>￥{{ formattedPurchasePrice }}</span></p>
+          
+          <label for="address">配送地址：</label>
+          <input
+            id="address"
+            type="text"
+            v-model="purchaseDetails.address"
+            placeholder="请输入配送地址"
           />
 
           <label for="payment-type">选择支付方式：</label>
@@ -144,6 +155,16 @@
           type="number"
           v-model="rentalDetails.quantity"
           min="1"
+        />
+
+        <p>总价格：<span>￥{{ formattedRentalPrice }}（含押金）</span></p>
+
+        <label for="address">配送地址：</label>
+        <input
+          id="address"
+          type="text"
+          v-model="rentalDetails.address"
+          placeholder="请输入配送地址"
         />
 
         <!-- 支付方式 -->
@@ -212,6 +233,18 @@
         }
         // 如果无图片或路径为空，可返回默认图
         return require("@/Resources/default-product.jpg");
+      },
+
+      formattedPurchasePrice() {
+        const totalPrice = this.product.price * this.purchaseDetails.quantity;
+        return totalPrice.toFixed(2);
+      },
+
+      formattedRentalPrice() {
+        const rentalFee = this.rentalDetails.days * this.rentalDetails.quantity * 0.1;
+        const deposit = 50;
+        const totalPrice = rentalFee + deposit;
+        return totalPrice.toFixed(2);
       },
     },
     created() {
@@ -402,10 +435,25 @@
       async confirmPurchase() {
         const storedUser = JSON.parse(localStorage.getItem("user"));
 
-        if (storedUser && storedUser.id) {
-          const userId = storedUser.id; // 当前用户的 ID
-          console.log("当前用户 ID:", userId);
+        if (!storedUser || !storedUser.id) {
+          alert("用户未登录，请先登录！");
+          return;
         }
+
+        if (!this.purchaseDetails.quantity || this.purchaseDetails.quantity <= 0) {
+          alert("购买数量必须是一个正整数！");
+          return;
+        }
+        if (this.purchaseDetails.quantity > this.product.stock) {
+          alert("购买数量不能超过商品库存！");
+          return;
+        }
+
+        if (!this.purchaseDetails.address || this.purchaseDetails.address.trim() === "") {
+          alert("请输入有效的配送地址！");
+          return;
+        }
+
         const userId = storedUser.id;
         try {
           const payload = new URLSearchParams();
@@ -413,7 +461,8 @@
           payload.append("productId", this.product.id); // 商品 ID
           payload.append("quantity", this.purchaseDetails.quantity); // 用户选择的购买数量
           payload.append("type", this.purchaseDetails.type); // 用户选择的支付方式
-          payload.append("price", this.product.price * this.purchaseDetails.quantity); // 总价格
+          payload.append("price", this.formattedPurchasePrice); // 总价格
+          payload.append("address", this.purchaseDetails.address);
 
           const response = await axios.post("/api/payment/purchase", payload, {
             headers: {
@@ -441,6 +490,102 @@
         } finally {
           this.closeDialog(); // 无论成功与否，都关闭弹窗
         }
+      },
+
+      async confirmRental() {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser || !storedUser.id) {
+          alert("用户未登录，请先登录！");
+          this.closeRentalDialog();
+          return;
+        }
+
+        const userId = storedUser.id;
+
+        // 验证用户输入
+        if (!this.rentalDetails.days || this.rentalDetails.days <= 0) {
+          alert("租借天数必须是一个正整数！");
+          return;
+        }
+
+        // 验证租借数量
+        if (!this.rentalDetails.quantity || this.rentalDetails.quantity <= 0) {
+          alert("租借数量必须是一个正整数！");
+          return;
+        }
+
+        // 验证地址
+        if (!this.rentalDetails.address || this.rentalDetails.address.trim() === "") {
+          alert("请输入有效的配送地址！");
+          return;
+        }
+
+        if (!this.product || !this.product.id) {
+          alert("商品信息加载失败，请稍后再试！");
+          this.closeRentalDialog();
+          return;
+        }
+
+        const productId = this.product.id;
+
+        try {
+          const payload = new URLSearchParams();
+          payload.append("userId", userId);
+          payload.append("productId", productId);
+          payload.append("days", this.rentalDetails.days); // 租借天数
+          payload.append("deposit", this.rentalDetails.deposit.toFixed(2));
+          payload.append("price", this.formattedRentalPrice);
+          payload.append("quantity", this.rentalDetails.quantity);
+          payload.append("type", this.rentalDetails.type);
+          payload.append("address", this.rentalDetails.address);
+
+          console.log(Object.fromEntries(payload.entries()));
+
+          const response = await axios.post("/api/payment/rental", payload, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          });
+
+          const { orderId, redirectUrl } = response.data;
+
+          localStorage.setItem(
+            "currentRentalOrder",
+            JSON.stringify({
+              orderId,
+              productId,
+              rentalDays: this.rentalDetails.days,
+              deposit: this.rentalDetails.deposit,
+              price: this.product.price,
+              paymentType: this.rentalDetails.type === 1 ? "微信" : "支付宝",
+            })
+          );
+
+          window.location.href = redirectUrl;
+        } catch (error) {
+          console.error("租借失败:", error);
+          alert("租借失败，请稍后再试。");
+        } finally {
+          this.closeRentalDialog();
+        }
+      },
+
+
+      async handleBuy() { 
+        this.showPurchaseDialog = true;
+      },
+      closeDialog() {
+        this.showPurchaseDialog = false;
+      },
+
+      // 打开租借弹窗
+      handleRent() {
+        this.showRentalDialog = true;
+      },
+
+      // 关闭租借弹窗
+      closeRentalDialog() {
+        this.showRentalDialog = false;
       },
     },
   };

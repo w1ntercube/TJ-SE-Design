@@ -54,13 +54,15 @@ public class PaymentService {
     /**
      * 创建购买订单
      */
-    public Long createPurchaseOrder(Long userId, Long productId, Integer quantity, BigDecimal price) {
+    public Long createPurchaseOrder(Long userId, Long productId, Integer quantity, BigDecimal price,String address) {
         PurchaseOrder order = new PurchaseOrder();
         order.setUserId(userId);
         order.setProductId(productId);
         order.setQuantity(quantity);
         order.setTotalPrice(price);
         order.setOrderStatus(OrderStatus.PENDING); // 待支付
+        order.setAddress(address);
+
         purchaseOrderRepository.save(order);
         return order.getId();
     }
@@ -73,7 +75,8 @@ public class PaymentService {
                                   Integer rentalDurationDays,
                                   BigDecimal deposit,
                                   BigDecimal price,
-                                  int quantity) {
+                                  int quantity,
+                                  String address) {
         RentalOrder order = new RentalOrder();
         order.setUserId(userId);
         order.setProductId(productId);
@@ -84,6 +87,7 @@ public class PaymentService {
         order.setTotalPrice(price);
         order.setQuantity(quantity);
         order.setOrderStatus(OrderStatus.PENDING); // 待支付
+        order.setAddress(address); // 设置地址
 
         rentalOrderRepository.save(order);
         return order.getId();

@@ -49,11 +49,12 @@ public class PaymentController {
             @RequestParam("productId") Long productId,
             @RequestParam("quantity") Integer quantity,
             @RequestParam("type") int type,
-            @RequestParam("price") BigDecimal price
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("address") String address
     ) {
 
         // 调用 Service 层创建购买订单
-        Long orderId = paymentService.createPurchaseOrder(userId, productId, quantity, price);
+        Long orderId = paymentService.createPurchaseOrder(userId, productId, quantity, price,address);
 
         // 构建支付页面 URL
         String redirectUrl = paymentService.buildPaymentUrl(orderId, type, price, "PURCHASE");
@@ -79,12 +80,13 @@ public class PaymentController {
             @RequestParam("price") BigDecimal price,
             @RequestParam("type") int type, // 支付方式: 微信1/支付宝2
             @RequestParam("quantity") Integer quantity,
+            @RequestParam("address") String address,
             Model model
     ) {
 
         // 调用 Service 层创建租赁订单
         Long orderId = paymentService.createRentalOrder(
-                userId, productId, days, deposit, price, quantity
+                userId, productId, days, deposit, price, quantity, address
         );
 
         // 构建支付页面 URL
