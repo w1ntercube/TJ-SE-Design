@@ -8,7 +8,8 @@ import cn.edu.tongji.instrument.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +33,23 @@ public class UserController {
     // 登录接口
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
+        User user = userService.findByUsername(loginRequest.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户不存在");
+        }
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("密码错误");
+        }
+        // 如果用户被封禁
+        if (user.getIsBanned() != null && user.getIsBanned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("账户已被封禁");
+        }
+        return ResponseEntity.ok(user); // 登录成功返回用户信息
+
+
+
+
+/*        try {
             // 验证用户名和密码
             boolean isValid = userService.validateUserLogin(loginRequest.getUsername(), loginRequest.getPassword());
             if (!isValid) {
@@ -49,13 +66,27 @@ public class UserController {
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("服务器错误：" + e.getMessage());
-        }
+        }*/
     }
 
     // 修改密码接口
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-        try {
+
+        // 1. 验证用户名是否存在
+        User user = userService.findByUsername(changePasswordRequest.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户名不存在");
+        }
+        // 2. 验证原密码是否正确
+        if (!user.getPassword().equals(changePasswordRequest.getOldPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("原密码错误");
+        }
+        // 3. 更新密码
+        user.setPassword(changePasswordRequest.getNewPassword());
+        userService.updateUser(user.getId(), user); // 假设 updateUser 方法支持修改密码
+
+        /*        try {
             userService.changePassword(
                     changePasswordRequest.getUsername(),
                     changePasswordRequest.getOldPassword(),
@@ -66,7 +97,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("服务器错误：" + e.getMessage());
-        }
+        }*/
+        return ResponseEntity.ok("密码修改成功");
     }
 
     // 查询所有用户
