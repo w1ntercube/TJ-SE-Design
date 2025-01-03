@@ -51,6 +51,41 @@
           <button type="submit" class="login-button">确认找回</button>
         </form>
       </div>
+       <!-- 根据action展示不同的表单 -->
+       <div class="login-box" v-if="action === 'modify'">
+          <form @submit.prevent="handleSubmit">
+            <div class="form-group">
+              <input
+                id="username"
+                v-model="username"
+                type="text"
+                placeholder="请输入用户名"
+                maxlength="50"
+              />
+            </div>
+  
+            <div class="form-group">
+              <input
+                id="oldPassword"
+                v-model="oldPassword"
+                type="password"
+                placeholder="请输入旧密码"
+              />
+            </div>
+  
+            <div class="form-group">
+              <input
+                id="newPassword"
+                v-model="newPassword"
+                type="password"
+                placeholder="请输入新密码"
+              />
+            </div>
+  
+            <button type="submit" class="login-button">确认修改</button>
+          </form>
+        </div>
+
     </div>
   </div>
 </template>
@@ -63,6 +98,9 @@ export default {
   props: ["action"], // 接收路由参数，用于区分找回密码和修改密码
   data() {
     return {
+      username: "", // 用于修改密码时的用户名
+      oldPassword: "", // 用于修改密码时的旧密码
+
       phone: "", // 用于找回密码时的手机号
       otp: "", // 用于找回密码时的验证码
       newPassword: "", // 新密码
@@ -72,7 +110,7 @@ export default {
   },
   computed: {
     title() {
-      return "找回密码";
+      return this.action === "modify" ? "修改密码" : "找回密码";
     },
   },
   methods: {
@@ -138,6 +176,43 @@ export default {
         }
       }
     },
+
+    //与后端对接的逻辑
+      handleSubmit() {
+        if (this.action === "modify") {
+          if (!this.username || !this.oldPassword || !this.newPassword) {
+            alert("请填写完整信息！");
+            return;
+          }
+  
+      // 调用后端修改密码 API
+      axios
+        .put("http://localhost:8080/api/users/change-password", {
+          username: this.username,
+          oldPassword: this.oldPassword,
+          newPassword: this.newPassword,
+        })
+        .then((response) => {
+          alert(response.data); // 返回成功信息
+          // 跳转登录页面
+      this.$router.push("/login");
+        })
+        .catch((error) => {
+          if (error.response) {
+            alert(error.response.data); // 错误信息
+          } else {
+            alert("请求失败：" + error.message);
+          }
+        });
+        }   
+        else if (this.action === "recover")
+        {
+          if (!this.phone || !this.code || !this.newPassword) {
+            alert("请填写完整信息！");
+            return;
+          }
+        }
+      }
   },
 };
 </script>
@@ -189,11 +264,19 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
+h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+  
 .form-group {
   margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
 }
+
 
 .form-group input {
   width: 70%;
