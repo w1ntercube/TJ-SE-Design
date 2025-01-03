@@ -20,7 +20,7 @@ public class SMSService {
     public String sendSMS(String phoneNumber) {
         String otp = generateOTP();
         otpStorage.put(phoneNumber, otp);
-        // 模拟发送短信（实际项目中可集成第三方短信服务，如阿里云、Twilio等）
+        // 没有实现真正的短信发送功能，这里模拟发送短信验证码
         System.out.println("向手机号 " + phoneNumber + " 发送验证码: " + otp);
         return otp;
     }
