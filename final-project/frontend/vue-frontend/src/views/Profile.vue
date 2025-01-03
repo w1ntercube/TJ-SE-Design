@@ -398,8 +398,8 @@ export default {
         orderStatus: "", // 店铺订单筛选状态
       },
 
-      messages: [], //初始化消息数组
-      userInput:"", //用户输入内容
+      messages: [],
+      userInput:"",
     };
   },
   methods: {
@@ -854,9 +854,7 @@ export default {
       }
     },
 
-
-  //发送消息给AI
-  sendMessage() {
+    async sendMessage() {
       if (this.userInput.trim() === "") {
         alert("请输入内容后发送！");
         return;
@@ -868,16 +866,33 @@ export default {
         content: this.userInput,
       });
 
-      // 清空输入框
+      // 暂存用户输入并清空输入框
+      const inputMessage = this.userInput;
       this.userInput = "";
 
-      // 模拟 AI 回复
-      setTimeout(() => {
+      try {
+        // 向后端发送请求
+        const response = await axios.post("http://localhost:8080/api/chat", null, {
+          params: {
+            message: inputMessage,
+          },
+        });
+
+        // 提取后端返回的 content
+        const content = response.data.choices[0].message.content;
+
+        // 添加 AI 的回复到消息列表
         this.messages.push({
           sender: "ai",
-          content: "你好！你好！",
+          content: content,
         });
-      }, 1000); // 模拟延迟
+      } catch (error) {
+        console.error("请求失败:", error);
+        this.messages.push({
+          sender: "ai",
+          content: "抱歉，我无法连接到服务器，请稍后重试。",
+        });
+      }
     },
 
 
