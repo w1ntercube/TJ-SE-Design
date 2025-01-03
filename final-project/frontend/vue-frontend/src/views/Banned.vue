@@ -46,7 +46,7 @@ export default {
   name: "BannedProfile",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("user")) || {
+      user: JSON.parse(sessionStorage.getItem("user")) || {
         username: "未登录用户",
         avatarUrl: "https://via.placeholder.com/50", // 默认头像
       },
