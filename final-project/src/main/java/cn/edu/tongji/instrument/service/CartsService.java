@@ -10,30 +10,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 @Service
 public class CartsService {
+
     @Autowired
     private CartsRepository cartsRepository;
 
-    public void addToCart(User user, Product product, int quantity) {
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ProductService productService;
+
+    public void addToCart(User user, Product product) {
         // 检查购物车中是否已经有该商品
         Carts existingCart = cartsRepository.findByUserAndProduct(user, product);
-        if (existingCart != null) {
-            // 如果存在，则更新数量
-            existingCart.setQuantity(existingCart.getQuantity() + quantity);
-            cartsRepository.save(existingCart);
-        } else {
+        if (existingCart == null) {
             // 如果不存在，则新增购物车记录
             Carts cart = new Carts();
             cart.setUser(user);
             cart.setProduct(product);
-            cart.setQuantity(quantity);
             cartsRepository.save(cart);
         }
     }
+
     public List<ProductDTO> getFavoriteProductsByUser(User user) {
         List<Carts> carts = cartsRepository.findByUser(user);
         return carts.stream()
@@ -51,6 +55,25 @@ public class CartsService {
             return true;
         }
         return false;
+    }
+
+    public boolean isCartsExist(Long userId, Long productId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return false; // 用户不存在
+        }
+        // 验证商品是否存在
+        Optional<Product> optionalProduct = productService.getProductById(productId);
+        if (optionalProduct.isEmpty()) {
+            return false; // 商品不存在
+        }
+
+        Product product = optionalProduct.get();
+        Carts result = cartsRepository.findByUserAndProduct(user, product);
+        // 验证商品是否在用户的收藏列表中
+
+
+        return result != null;
     }
 
 }

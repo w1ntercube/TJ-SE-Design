@@ -45,8 +45,10 @@
               <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
               <div class="product-info">
                 <h3>{{ product.name }}</h3>
-                <p>价格：￥{{ product.price }}</p>
-                <p>库存：{{ product.stock }}</p>
+                <p>出售价格：￥{{ product.price }}</p>
+                <p>出租价格：￥{{ product.rentalPrice }}</p>
+                <p>出售库存：{{ product.stock }}</p>
+                <p>出租库存：{{ product.rentalStock }}</p>
               </div>
               <button @click.stop="removeFromFavorites(product.id)" class="remove-button">移除收藏</button>
             </div>
@@ -64,30 +66,28 @@
                 <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
                 <div class="product-info">
                   <h3>{{ product.name }}</h3>
-                  <p>价格：￥{{ product.price }}</p>
-                  <p>库存：{{ product.stock }}</p>
+                  <p>出售价格：￥{{ product.price }}</p>
+                  <p>出租价格：￥{{ product.rentalPrice }}</p>
+                  <p>出售库存：{{ product.stock }}</p>
+                  <p>出租库存：{{ product.rentalStock }}</p>
                 </div>
                 <div class="Stock-input" @click.stop>
                 <!-- 添加库存数量输入框 -->
                 <input 
                   type="number" 
                   v-model="product.addStocks" 
-                  min="1" 
-                  placeholder="补充库存数量" 
+                  placeholder="调整库存数量" 
                 />
                 <!-- 减少库存数量输入框 -->
                 <input 
                   type="number" 
                   v-model="product.lessStocks" 
-                  min="1" 
-                  placeholder="减少库存数量" 
+                  placeholder="调整库存数量" 
                 />
               </div>
               <div class="buttonInput" >
-                <!-- 补充库存按钮 -->
-                <button @click.stop="addStock(product.id, product.addStocks)" class="Stock-button">补充库存</button>
-                <!-- 减少库存按钮 -->
-                <button @click.stop="lessStock(product.id, product.lessStocks)" class="Stock-button">减少库存</button>
+                <button @click.stop="adjustSellStock(product.id, product.addStocks)" class="Stock-button">调整出售库存</button>
+                <button @click.stop="adjustRentStock(product.id, product.lessStocks)" class="Stock-button">调整出租库存</button>
               </div>
                 
                 <button @click.stop="removeProduct(product.id)" class="remove-button">下架</button>
@@ -110,7 +110,7 @@
               <select id="consumerOrderType" v-model="filters.orderType" class="filter-select">
                 <option value="">全部</option>
                 <option value="PURCHASE">购买订单</option>
-                <option value="RENTAL">租借订单</option>
+                <option value="RENTAL">出租订单</option>
               </select>
 
               <label for="consumerOrderStatus">订单状态：</label>
@@ -128,7 +128,7 @@
               <button @click="applyFilters" class="filter-button">筛选</button>
             </div>
 
-            <!-- 消费订单列表 -->
+            <!-- 订单列表 -->
             <div v-if="consumerOrders.length > 0" class="order-list">
               <div v-for="order in consumerOrders" :key="order.id" class="order-item">
                 <img :src="getProductImageUrl(order.imagePath)" alt="商品图片" class="order-image" />
@@ -291,7 +291,7 @@
               </div>
               <div class="form-group-price">
                 <label for="price">出租价格：</label>
-                <input type="number" id="price" v-model="newProduct.rental_price" required />
+                <input type="number" id="price" step="0.01" v-model="newProduct.rental_price" required />
               </div>
             </div>
 
@@ -373,9 +373,10 @@ export default {
       newProduct: {
         name: "",
         price: 0,
+        rental_price: 0,
         stock: 0,
+        rental_stock: 0,
         description: "",
-        imageUrl: "",
       },
       consumerOrders: [], // 存储消费订单
       sellerOrders: [], // 店铺订单列表
@@ -418,7 +419,7 @@ export default {
     // 获取收藏商品数据
     async fetchFavorites() {
       try {
-        const response = await axios.get(`/api/carts/${this.user.id}`);
+        const response = await axios.get(`/api/carts/find/${this.user.id}`);
         if (response.status === 200) {
           this.favoriteProducts = response.data; 
         } else {
@@ -433,7 +434,7 @@ export default {
     // 移除收藏
     async removeFromFavorites(productId) {
       try {
-        const response = await axios.delete(`/api/carts/${this.user.id}/${productId}`);
+        const response = await axios.put(`/api/carts/toggle/${this.user.id}/${productId}`);
         if (response.status === 200) {
           this.favoriteProducts = this.favoriteProducts.filter(product => product.id !== productId);
           alert("已移除收藏");
@@ -495,10 +496,10 @@ export default {
       }
     },
     // 增加库存
-    async addStock(productId, quantity) {
+    async adjustSellStock(productId, quantity) {
       try {
         console.log(productId, quantity);
-        const response = await axios.post(`/api/products/addStock`, {
+        const response = await axios.post(`/api/products/adjustSellStock`, {
           productId: productId,
           quantity: quantity
         });
@@ -507,22 +508,22 @@ export default {
           this.products = this.products.map(product =>
             product.id === productId ? updatedProduct : product
           ); // 更新产品列表中的库存信息
-          alert("库存已增加");
+          alert("出售的库存已调整");
           this.fetchProducts();
           this.setActiveTab('products');
         } else {
-          alert("增加库存失败");
+          alert("调整库存失败");
         }
       } catch (error) {
-        console.error("增加库存时出错", error);
-        alert("增加库存失败");
+        console.error("调整库存时出错", error);
+        alert("调整库存失败");
       }
     },
     // 减少库存
-    async lessStock(productId, quantity) {
+    async adjustRentStock(productId, quantity) {
       try {
         console.log(productId, quantity);
-        const response = await axios.post(`/api/products/lessStock`, {
+        const response = await axios.post(`/api/products/adjustRentStock`, {
           productId: productId,
           quantity: quantity
         });
@@ -531,15 +532,15 @@ export default {
           this.products = this.products.map(product =>
             product.id === productId ? updatedProduct : product
           ); // 更新产品列表中的库存信息
-          alert("库存已减少");
+          alert("出租库存已调整");
           this.fetchProducts();
           this.setActiveTab('products');
         } else {
-          alert("减少库存失败");
+          alert("调整库存失败");
         }
       } catch (error) {
-        console.error("减少库存时出错", error);
-        alert("减少库存失败");
+        console.error("调整库存时出错", error);
+        alert("调整库存失败");
       }
     },
 
@@ -595,41 +596,38 @@ export default {
     // 上架商品
     async addProduct() {
       if (this.newProduct.name && this.newProduct.price && this.newProduct.rental_price 
-          && this.newProduct.stock && this.newProduct.rental_stock 
-          && this.newProduct.description && this.newProduct.imageUrl) {
+          && (this.newProduct.stock || this.newProduct.rental_stock) 
+          && this.newProduct.description) {
         const formData = new FormData();
+        formData.append('name', this.newProduct.name);
+        formData.append('price', this.newProduct.price); 
+        formData.append('rental_price', this.newProduct.rental_price);
+        formData.append('stock', this.newProduct.stock);
+        formData.append('rental_stock', this.newProduct.rental_stock);
+        formData.append('description', this.newProduct.description);
+        formData.append('seller_id', this.user.id);
+        formData.append('is_active', true); 
+        
 
-        // 添加商品信息到 FormData
-        formData.append("name", this.newProduct.name);
-        formData.append("price", this.newProduct.price);
-        formData.append("rental_price", this.newProduct.rental_price);
-        formData.append("stock", this.newProduct.stock);
-        formData.append("rental_stock", this.newProduct.rental_stock);
-        formData.append("description", this.newProduct.description);
-        formData.append("seller_id", this.user.id); 
-        formData.append("is_active", 1); 
-
-        // 添加图片到 FormData
-        const file = this.$refs.image.files[0]; // 使用 ref 获取文件
+        const file = this.$refs.image.files[0];
         if (file) {
-          formData.append("image", file);
+          formData.append("file", file);
         } else {
           alert("请上传商品图片");
           return;
         }
 
         try {
-          // 发送请求到后端
-          const response = await axios.post('/api/products/upload', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+          for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+          }
+          const response = await axios.post('/api/products/addProduct', formData);
+
 
           if (response.status === 200) {
-            alert(response.data);  // 商品上传成功提示
-            this.resetNewProduct(); // 重置表单
-            this.fetchProducts();  // 上传成功后刷新商品列表
+            alert("商品上传成功");
+            this.resetNewProduct(); 
+            this.fetchProducts();  
           } else {
             alert("上传失败，请稍后再试");
           }
@@ -641,6 +639,7 @@ export default {
         alert("请填写所有商品信息");
       }
     },
+
 
     // 重置上架商品表单
     resetNewProduct() {
@@ -655,11 +654,6 @@ export default {
       };
       // 清空图片输入
       this.$refs.image.value = ""; 
-    },
-
-    // 点击商品时执行的函数
-    showProductId(productId) {
-      console.log("点击的商品ID:", productId);  // 输出商品ID
     },
 
     // 调用接口获取用户信息

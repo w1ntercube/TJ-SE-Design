@@ -8,21 +8,27 @@
         <div v-else>
           <h3>{{ product.name }}</h3>
           <img :src="fullImagePath" alt="商品图片" class="product-detail-image" />
-          <p>价格：¥{{ product.price }}</p>
-          <p>库存：{{ product.stock }}</p>
+          <p>出售价格：¥{{ product.price.toFixed(2) }}, 出售库存：{{ product.stock.toFixed(2) }}</p>
+          <p>出租价格：¥{{ product.rentalPrice.toFixed(2) }}, 出租库存：{{ product.rentalStock.toFixed(2) }}</p>
+
     
           <!-- 卖家信息 -->
-          <div class="seller-info">
-            <p>商家名称：{{ product.seller?.username }}</p>
-            <p>商家信誉分：{{ product.seller?.reputationScore }}</p>
+          <div v-if="seller && seller.username" class="seller-info">
+            <p>商家名称：{{ seller.username }}</p>
+            <p>商家信誉分：{{ seller.reputationScore }}</p>
           </div>
-    
+          <div v-else>
+            <p>商家信息加载中...</p>
+          </div>
           <p>描述：{{ product.description }}</p>
         </div>
         
       </div>
       <div class="action-buttons">
-          <button class="action-button" @click="handleLike">加入喜欢</button>
+
+          <button class="action-button" @click="handleLike">
+            {{ loading ? '加载中...' : (isLiked ? '取消喜欢' : '加入喜欢') }}
+          </button>
           <button class="action-button" @click="handleBuy">立即购买</button>
           <button class="action-button" @click="handleRent">租借试试</button>
       </div>
@@ -198,6 +204,7 @@
     data() {
       return {
         product: {},    // 保存获取到的商品信息
+        seller: {},
         reviews: [],    // 保存获取到的评论列表
         newReview: {
           userId: null, // 从用户登录信息中获取
@@ -205,8 +212,9 @@
           comment: "",
           rating: 5,
         },
+        loading: false, // 是否正在加载数据
         isLoading: true, // 是否正在加载数据
-
+        isLiked: false, // 是否已收藏
         // 购买弹窗相关
         showPurchaseDialog: false, // 控制弹窗显示
         purchaseDetails: {
@@ -254,17 +262,26 @@
       this.fetchProductDetails(productId);
       // 获取评论信息
       this.fetchProductReviews(productId);
+      // 获取用户是否已收藏该商品
+      this.fetchLikeStatus(productId);
+
+
     },
     methods: {
       // 获取商品详细信息
-      fetchProductDetails(productId) {
+      fetchProductDetails(id) {
         axios
-        .get(`/api/products/${productId}`)
+        .get(`/api/products/${id}`)
         .then((response) => {
           this.product = response.data;
+          // 在商品详情成功后，调用获取卖家信息的方法
+          return axios.get(`/api/products/getSeller/${id}`);
+        })
+        .then((response) => {
+          this.seller = response.data; // 存储卖家信息
         })
         .catch((error) => {
-          console.error("获取商品详情失败:", error);
+          console.error("获取商品详情或卖家信息失败:", error);
         })
         .finally(() => {
           this.isLoading = false;
@@ -284,6 +301,27 @@
           })
           .catch((error) => {
             console.error("获取商品评论失败:", error);
+          });
+      },
+      // 获取用户是否已收藏该商品
+      fetchLikeStatus(productId) {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+
+        if (!storedUser || !storedUser.id) {
+          return;
+        }
+
+        const userId = storedUser.id;
+
+        axios
+          .get(`/api/carts/exists/${userId}/${productId}`)
+          .then((response) => {
+            this.isLiked = response.data;
+            console.log("获取收藏状态成功:", response.data);
+            this.loading = false;
+          })
+          .catch((error) => {
+            console.error("获取收藏状态失败:", error);
           });
       },
       // 返回
@@ -308,26 +346,37 @@
           return;
         }
 
-        // 构建请求数据
-        const params = new URLSearchParams();
-        params.append("userId", userId);
-        params.append("productId", this.product.id);
-        params.append("quantity", 1); 
 
-        // 发起 POST 请求
-        axios
-          .post(`/api/carts`, params, {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          })
-          .then(() => {
-            alert("已成功加入喜欢列表！");
-          })
-          .catch((error) => {
-            console.error("加入喜欢失败:", error);
-            alert("加入喜欢失败，请稍后重试！");
-          });
+        // 发起 PUT 请求
+        axios.put(`/api/carts/toggle/${userId}/${this.product.id}`)
+        .then((response) => {
+          // 判断后端返回值
+          if (response.data === true) {
+            this.isLiked = true;
+            this.loading = false;
+            console.log(this.isLiked);
+
+            this.fetchLikeStatus(this.productId);
+            console.log('后');
+            console.log(this.isLiked);
+
+            alert("已成功加入收藏！");
+          } else {
+            this.isLiked = false;
+            this.loading = false;
+            console.log(this.isLiked);
+            
+            this.fetchLikeStatus(this.productId);
+            console.log('后');
+            console.log(this.isLiked);
+
+            alert("已成功移除收藏！");
+          }
+        })
+        .catch((error) => {
+          console.error("切换收藏状态失败:", error);
+          alert("操作失败，请稍后重试！");
+        });
       },
       // 提交评论
       submitReview() {
@@ -579,6 +628,16 @@
         this.showRentalDialog = false;
       },
     },
+    async mounted() {
+      // 在组件挂载时获取喜欢状态
+      console.log('前');
+      console.log(this.isLiked);
+      this.productId = this.$route.params.productId; // 假设通过路由参数传递 productId
+      this.fetchLikeStatus(this.productId);
+      console.log(this.isLiked);
+      console.log('后');
+      
+  },
   };
   </script>
   
@@ -857,7 +916,7 @@
     /* 卖家信息，可参考 .seller-info, .seller-reputation */
     .seller-info {
       font-size: 20px;
-      color: #2cef2f; 
+      color: #3f8f2ff6; 
     }
 
     .seller-reputation {
