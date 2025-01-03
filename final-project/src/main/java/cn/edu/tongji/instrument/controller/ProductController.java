@@ -1,21 +1,18 @@
 package cn.edu.tongji.instrument.controller;
 
-import cn.edu.tongji.instrument.dto.ProductDTO;
 import cn.edu.tongji.instrument.entity.Product;
 import cn.edu.tongji.instrument.entity.User;
 import cn.edu.tongji.instrument.service.UserService;
 import cn.edu.tongji.instrument.service.ProductService;
 import cn.edu.tongji.instrument.util.FileUploadUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,126 +28,113 @@ public class ProductController {
     private UserService userService;  // 用于通过卖家名称获取卖家
 
 
-    // 获取所有商品及对应卖家信息
-    @GetMapping("/all-with-sellers")
-    public ResponseEntity<List<Map<String, Object>>> getAllProductsWithSellers() {
-        List<Product> products = productService.getSeenProducts();
-        List<Map<String, Object>> result = products.stream().map(product -> {
-            User seller = userService.getUserById(product.getSellerId());
-            return Map.of(
-                    "product", product,
-                    "seller", seller
-            );
-        }).toList();
 
-        return ResponseEntity.ok(result);
+    // 获取所有商品
+    @GetMapping("/all")
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
     }
 
-
-    // 根据商品ID获取卖家信息
-    @GetMapping("/getSeller/{id}")
-    public ResponseEntity<User> getUserByProductId(@PathVariable Long id) {
-        // 查询商品
-        Optional<Product> productOptional = productService.getProductById(id);
-
-        // 如果商品不存在，返回 404
-        if (productOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        // 获取商品对象
-        Product product = productOptional.get();
-
-        // 通过商品的 sellerId 获取卖家信息
-        User seller = userService.getUserById(product.getSellerId());
-
-        // 如果卖家信息不存在，返回 404
-        if (seller == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        // 返回卖家信息
-        return ResponseEntity.ok(seller);
-    }
-
-
-    // 根据商品id获取商品信息
+    // 根据商品ID获取商品
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(@PathVariable Long id) {
-        Optional<Product> productOptional = productService.getProductById(id);
-        if (productOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(productOptional.get());
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        Optional<Product> product = productService.getProductById(id);
+        return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // 添加商品
+    @PostMapping
+    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
+        Product savedProduct = productService.addProduct(product);
+        return ResponseEntity.ok(savedProduct);
+    }
+
+    // 更新商品
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
+        product.setId(id);
+        Product updatedProduct = productService.updateProduct(product);
+        return ResponseEntity.ok(updatedProduct);
     }
 
     // 下架商品
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-        // 查找商品
-        Optional<Product> productOptional = productService.getProductById(id);
-        if (productOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("Product not found");
+        try {
+            // 查找商品
+            Optional<Product> productOptional = productService.getProductById(id);
+            if (!productOptional.isPresent()) {
+                return ResponseEntity.status(404).body("Product not found");
+            }
+
+            Product product = productOptional.get();
+
+            // 删除商品图片
+            String imagePath = product.getImagePath();
+            System.out.println("准备删除的图片路径："+imagePath);
+            if (imagePath != null && !imagePath.isEmpty()) {
+                FileUploadUtil.deleteFile(imagePath);  // 删除图片文件
+            }
+
+            // 删除商品记录
+            productService.deleteProduct(id);
+
+            return ResponseEntity.ok("Product deleted successfully");
         }
 
-        Product product = productOptional.get();
+        catch (IOException e) {
 
-        product.setIsActive(false); // 增加库存
-        productService.updateProduct(product);
-
-        return ResponseEntity.ok("Product deleted successfully");
+            return ResponseEntity.status(500).body("Error deleting product: " + e.getMessage());
+        }
     }
 
 
 
     // 上传商品（包括商品图片）
-    @PostMapping("/addProduct")
-    public ResponseEntity<ProductDTO> uploadProductWithImage(
-            HttpServletRequest request,
-            @RequestParam(value = "name") String name,
-            @RequestParam(value = "price") BigDecimal price,
-            @RequestParam(value = "rental_price") BigDecimal rentalPrice,
-            @RequestParam(value = "stock") int stock,
-            @RequestParam(value = "rental_stock") int rentalStock,
-            @RequestParam(value = "description") String description,
-            @RequestParam(value = "seller_id") Long sellerId,
-            @RequestParam(value = "is_active") Boolean isActive,
-            @RequestParam(value = "file", required = false) MultipartFile file) {
-
-        System.out.println("Content-Type: " + request.getContentType());
-        System.out.println("Name: " + name);
-        System.out.println("Price: " + price);
-        System.out.println("File: " + (file != null ? file.getOriginalFilename() : "No file uploaded"));
-
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setName(name);
-        productDTO.setPrice(price);
-        productDTO.setRentalPrice(rentalPrice);
-        productDTO.setStock(stock);
-        productDTO.setRentalStock(rentalStock);
-        productDTO.setDescription(description);
-        productDTO.setSellerId(sellerId);
-        productDTO.setIsActive(isActive);
-
-        // 校验逻辑
-        if (productDTO.getName() == null || productDTO.getName().isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadProductWithImage(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") double price,
+            @RequestParam("stock") int stock,
+            @RequestParam("seller_name") String sellerName,
+            @RequestParam("image") MultipartFile imageFile) {
 
         try {
-            ProductDTO savedProduct = productService.addProduct(productDTO, file);
-            return ResponseEntity.ok(savedProduct);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            // 获取卖家信息，假设通过卖家名称查找卖家ID
+            User seller = userService.findByUsername(sellerName);
+            if (seller == null) {
+                return ResponseEntity.status(400).body("Seller not found");
+            }
+
+            // 生成商品ID（使用时间戳或UUID）
+            long productId = System.currentTimeMillis();  // 使用时间戳生成唯一商品ID
+
+            // 处理图片上传
+            String imageFileName = FileUploadUtil.saveFile(imageFile, productId, "uploads/images");  // 传入目录路径
+
+            // 将时间戳转换为 LocalDateTime
+            LocalDateTime createdAt = LocalDateTime.ofEpochSecond(productId / 1000, 0, ZoneOffset.UTC);
+
+            // 创建商品对象
+            Product product = new Product();
+            product.setName(name);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setStock(stock);
+            product.setSeller(seller);  // 设置卖家
+            product.setIsActive(true);  // 默认商品激活
+            product.setImagePath(imageFileName);  // 保存图片路径
+            product.setCreatedAt(createdAt);  // 设置创建时间
+
+            // 保存商品到数据库
+            Product savedProduct = productService.addProduct(product);
+
+            return ResponseEntity.ok("Product uploaded successfully with ID: " + savedProduct.getId());
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(500).body("Error uploading image: " + e.getMessage());
         }
     }
-
-
 
     // 根据卖家用户名查询商品
     @PostMapping("/by-seller")
@@ -165,18 +149,29 @@ public class ProductController {
         }
 
         // 查找该卖家的所有商品
-        List<Product> products = productService.getProductsBySeller(seller.getId());
-        List<Product> activeProducts = new ArrayList<>(); // 初始化 activeProducts
-        for (Product product : products) {
-            if (product.getIsActive()) {
-                activeProducts.add(product);
-            }
-        }
-        return ResponseEntity.ok(activeProducts);  // 返回商品列表
+        List<Product> products = productService.getProductsBySeller(seller);
+        return ResponseEntity.ok(products);  // 返回商品列表
     }
-    // 调整出售库存
-    @PostMapping("/adjustSellStock")
-    public ResponseEntity<String> adjustSellStock(@RequestBody Map<String, Object> request) {
+    // 增加库存
+    @PostMapping("/addStock")
+    public ResponseEntity<String> addStock(@RequestBody Map<String, Object> request) {
+        Long productId = ((Number) request.get("productId")).longValue();
+        Integer quantity = ((Number) request.get("quantity")).intValue();
+
+        Optional<Product> productOptional = productService.getProductById(productId);
+        if (productOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Product not found");
+        }
+
+        Product product = productOptional.get();
+        product.setStock(product.getStock() + quantity); // 增加库存
+        productService.updateProduct(product);
+
+        return ResponseEntity.ok("Stock updated successfully");
+    }
+    // 减少库存
+    @PostMapping("/lessStock")
+    public ResponseEntity<String> lessStock(@RequestBody Map<String, Object> request) {
         Long productId = ((Number) request.get("productId")).longValue();
         Integer quantity = ((Number) request.get("quantity")).intValue();
 
@@ -188,35 +183,12 @@ public class ProductController {
         Product product = productOptional.get();
         int currentStock = product.getStock();
         // 判断库存减少量是否大于当前库存
-        if (quantity + currentStock < 0) {
-            return ResponseEntity.status(400).body("Insufficient stock to reduce by " + quantity * -1);
+        if (quantity > currentStock) {
+            return ResponseEntity.status(400).body("Insufficient stock to reduce by " + quantity);
         }
 
-        product.setStock(product.getStock() + quantity); // 增加库存
-        productService.updateProduct(product);
-
-        return ResponseEntity.ok("Stock updated successfully");
-    }
-    // 减少库存
-    @PostMapping("/adjustRentStock")
-    public ResponseEntity<String> adjustRentStock(@RequestBody Map<String, Object> request) {
-        Long productId = ((Number) request.get("productId")).longValue();
-        Integer quantity = ((Number) request.get("quantity")).intValue();
-
-        Optional<Product> productOptional = productService.getProductById(productId);
-        if (productOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("Product not found");
-        }
-
-        Product product = productOptional.get();
-        int currentStock = product.getRentalStock();
-        // 判断库存减少量是否大于当前库存
-        if (quantity + currentStock < 0) {
-            return ResponseEntity.status(400).body("Insufficient stock to reduce by " + quantity * -1);
-        }
-
-        // 调整库存
-        product.setRentalStock(currentStock + quantity);
+        // 减少库存
+        product.setStock(currentStock - quantity);
         productService.updateProduct(product);
 
         return ResponseEntity.ok("Stock updated successfully");

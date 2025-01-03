@@ -6,80 +6,66 @@ import cn.edu.tongji.instrument.repository.OrderRepository;
 import cn.edu.tongji.instrument.repository.ProductRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class OrderService {
+public class SellerOrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
 
-    public OrderService(PurchaseOrderRepository purchaseOrderRepository,
-                        RentalOrderRepository rentalOrderRepository) {
+    public SellerOrderService(
+            ProductRepository productRepository,
+            OrderRepository orderRepository,
+            PurchaseOrderRepository purchaseOrderRepository,
+            RentalOrderRepository rentalOrderRepository
+    ) {
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.rentalOrderRepository = rentalOrderRepository;
     }
 
-    // 查询所有订单
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-    // 查询单个订单
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
-    }
-
-    // 更新订单状态
-    public Order updateOrderStatus(Long id, OrderStatus status) {
-        Order order = getOrderById(id);
-        order.setOrderStatus(status);
-        return orderRepository.save(order);
-    }
-
     /**
-     * 根据用户ID、订单类型和订单状态筛选订单
+     * 获取卖家订单（支持根据订单状态和订单种类筛选）
      *
-     * @param userId 用户ID
-     * @param orderType 可选：订单类型（"PURCHASE" 或 "RENTAL"）
+     * @param sellerId 卖家 ID
+     * @param orderType 可选：订单种类（"PURCHASE" 或 "RENTAL"）
      * @param orderStatus 可选：订单状态
-     * @return 筛选后的订单数据列表
+     * @return 卖家订单列表
      */
+    public List<Map<String, Object>> getSellerOrders(Long sellerId, String orderType, OrderStatus orderStatus) {
+        // 查找卖家所有商品的 ID
+        List<Long> productIds = productRepository.findBySellerId(sellerId)
+                .stream()
+                .map(Product::getId)
+                .collect(Collectors.toList());
 
-    /**
-     * 根据用户ID、订单类型和订单状态筛选订单
-     */
-    public List<Map<String, Object>> getOrdersByUserAndFilters(Long userId, String orderType, OrderStatus orderStatus) {
+        if (productIds.isEmpty()) {
+            return Collections.emptyList(); // 如果没有商品，直接返回空列表
+        }
+
         List<Map<String, Object>> result = new ArrayList<>();
 
-        // 处理购买订单
+        // 查询购买订单
         if (orderType == null || "PURCHASE".equalsIgnoreCase(orderType)) {
             List<PurchaseOrder> purchaseOrders = (orderStatus == null)
-                    ? purchaseOrderRepository.findByUserId(userId)
-                    : purchaseOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus);
+                    ? purchaseOrderRepository.findByProductIdIn(productIds)
+                    : purchaseOrderRepository.findByProductIdInAndOrderStatus(productIds, orderStatus);
 
             purchaseOrders.forEach(order -> result.add(convertPurchaseOrderToMap(order)));
         }
 
-        // 处理租赁订单
+        // 查询租赁订单
         if (orderType == null || "RENTAL".equalsIgnoreCase(orderType)) {
             List<RentalOrder> rentalOrders = (orderStatus == null)
-                    ? rentalOrderRepository.findByUserId(userId)
-                    : rentalOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus);
+                    ? rentalOrderRepository.findByProductIdIn(productIds)
+                    : rentalOrderRepository.findByProductIdInAndOrderStatus(productIds, orderStatus);
 
             rentalOrders.forEach(order -> result.add(convertRentalOrderToMap(order)));
         }
@@ -109,7 +95,6 @@ public class OrderService {
         return map;
     }
 
-
     /**
      * 转换租赁订单为统一格式
      */
@@ -136,29 +121,30 @@ public class OrderService {
         return map;
     }
 
-    public Order confirmOrderDelivery(Long orderId) {
-        Order order = getOrderById(orderId);
 
-        // 检查当前订单状态是否为 SHIPPED
-        if (!OrderStatus.SHIPPED.equals(order.getOrderStatus())) {
-            throw new IllegalStateException("订单状态必须为 'SHIPPED' 才能确认收货");
-        }
-
-        // 更新订单状态为 DELIVERED
-        order.setOrderStatus(OrderStatus.DELIVERED);
-        return orderRepository.save(order);
-    }
-
-    // 退还订单逻辑
-    public Order returnOrder(Long id) {
+    // 发货
+    public Order shipOrder(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
 
-        if (!order.getOrderStatus().equals(OrderStatus.DELIVERED)) {
-            throw new IllegalStateException("Only DELIVERED orders can be returned.");
+        if (!order.getOrderStatus().equals(OrderStatus.PAID)) {
+            throw new IllegalStateException("Only PAID orders can be shipped.");
         }
 
-        order.setOrderStatus(OrderStatus.RETURNED);
+        order.setOrderStatus(OrderStatus.SHIPPED);
+        return orderRepository.save(order);
+    }
+
+    // 商家确认
+    public Order confirmMerchantReturn(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+
+        if (!order.getOrderStatus().equals(OrderStatus.RETURNED)) {
+            throw new IllegalStateException("Only RETURNED orders can be confirmed by the merchant.");
+        }
+
+        order.setOrderStatus(OrderStatus.MERCHANT_CONFIRMED);
         return orderRepository.save(order);
     }
 }

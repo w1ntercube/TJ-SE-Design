@@ -18,24 +18,31 @@
     <div class="product-container">
       <div
         class="product-card"
-        v-for="productData in paginatedProducts"
-        :key="productData.product.id"
-        @click="goToProductPage(productData.product.id)"
+        v-for="product in paginatedProducts"
+        :key="product.id"
+        @click="goToProductPage(product.id)"
       >
-        <img :src="baseURL + productData.product.imagePath" alt="商品图片" class="product-image" />
-        <h3 class="product-name">{{ productData.product.name }}</h3>
-        <p class="product-price">价格：¥{{ productData.product.price }}</p>
+        <img :src="baseURL+product.imagePath" alt="商品图片" class="product-image" />
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-price">价格：¥{{ product.price }}</p>
         <!-- 商家信息 -->
-        <p class="seller-info">商家：{{ productData.seller?.username || "加载中..." }}</p>
-        <p class="seller-reputation">信誉积分：{{ productData.seller?.reputationScore || "加载中..." }}</p>
+        <p class="seller-info">商家：{{ product.seller.username }}</p>
+        <p class="seller-reputation">信誉积分：{{ product.seller.reputationScore }}</p>
       </div>
     </div>
 
     <!-- 分页功能 -->
     <div class="pagination">
-      <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">上一页</button>
+      <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">
+        上一页
+      </button>
       <span>{{ currentPage }} / {{ totalPages }}</span>
-      <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">下一页</button>
+      <button
+        @click="goToPage(currentPage + 1)"
+        :disabled="currentPage === totalPages"
+      >
+        下一页
+      </button>
     </div>
   </div>
 </template>
@@ -51,82 +58,102 @@ export default {
   name: "ToHome",
   data() {
     return {
-      baseURL: "http://localhost:8080",
-      user: {
+    baseURL:'http://localhost:8080', //由于是本地，所以源目录为这个
+
+      user: JSON.parse(localStorage.getItem("user")) || {
         username: "未登录用户",
-        avatarUrl: require('@/Resources/user.jpg'),
+        avatarUrl: require('@/Resources/user.jpg'), // 默认头像
       },
       searchQuery: "",
-      productWithSellerData: [], // 商品及卖家信息
-      currentPage: 1,
-      itemsPerPage: 5,
+      products: [], // 商品列表（从接口获取）
+      currentPage: 1, // 当前页
+      itemsPerPage: 5, // 每页商品数（4*2）
     };
   },
   computed: {
+    userAvatar() {
+      return this.user.avatarUrl && this.user.avatarUrl !== 'null'
+        ? this.user.avatarUrl
+        : require('@/Resources/user.jpg');
+    },
     filteredProducts() {
-      if (!this.searchQuery) return this.productWithSellerData;
-      return this.productWithSellerData.filter((data) =>
-        data.product.name.includes(this.searchQuery)
+      if (!this.searchQuery) return this.products;
+      return this.products.filter((product) =>
+        product.name.includes(this.searchQuery)
       );
     },
     totalPages() {
-      return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+      return Math.ceil(this.filteredProducts.length / this.itemsPerPage); // 计算总页数
     },
     paginatedProducts() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.filteredProducts.slice(start, end);
+      return this.filteredProducts.slice(start, end); // 获取当前页的商品
     },
   },
   methods: {
-    fetchProductsWithSellers() {
+
+    // 获取商品数据
+    fetchProducts() {
       axios
-        .get("/api/products/all-with-sellers")
-        .then(({ data }) => {
-          this.productWithSellerData = data;
+        .get("/api/products/all") 
+        .then((response) => {
+          this.products = response.data; // 将返回的数据赋给 products
         })
-        .catch((error) => console.error("获取商品及卖家信息失败:", error));
+        .catch((error) => {
+          console.error("获取商品列表失败:", error);
+        });
     },
-    fetchUserInfo(username) {
+
+
+        // 获取用户信息
+        fetchUserInfo(username) {
       axios
         .get(`/api/users/username/${username}`)
-        .then(({ data }) => {
-          this.user = {
-            ...data,
-            avatarUrl: this.baseURL + data.avatarUrl,
-          };
+        .then((response) => {
+          this.user = response.data; // 设置获取到的用户数据
+          console.log(this.user.avatarUrl);
+          this.user.avatarUrl='http://localhost:8080'+this.user.avatarUrl;
         })
-        .catch((error) => console.error("获取用户信息失败:", error));
+        .catch((error) => {
+          console.error("获取用户信息失败:", error);
+          this.user = {
+            username: "获取用户信息失败",
+            avatarUrl: require('@/Resources/user.jpg'),
+          };
+        });
     },
+
+    //搜索功能
     handleSearch() {
       alert(`搜索关键词：${this.searchQuery}`);
     },
     goToPage(page) {
       if (page < 1 || page > this.totalPages) return;
-      this.currentPage = page;
+      this.currentPage = page; // 更新当前页
     },
+
+    // 跳转到商品详情页面
     goToProductPage(productId) {
+      // 使用 Vue Router 进行跳转
       this.$router.push({
-        name: "ProductDetail",
-        params: { id: productId },
+        name: "ProductDetail", // 路由名（在 router/index.js 中配置）
+        params: { id: productId }, 
       });
     },
   },
   created() {
-    this.fetchProductsWithSellers();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser?.username) {
-      this.fetchUserInfo(storedUser.username);
-    }
+    // 组件创建时加载商品列表
+    this.fetchProducts();
+      // 从 localStorage 获取用户信息
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (storedUser && storedUser.username) {
+    // 如果找到了用户名，调用 fetchUserInfo 并传递用户名
+    this.fetchUserInfo(storedUser.username);
+  }
   },
 };
 </script>
-
-<style scoped>
-/* 样式保持不变 */
-</style>
-
-
   
   <style scoped>
   /* 全局样式 */

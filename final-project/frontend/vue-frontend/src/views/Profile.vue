@@ -45,10 +45,8 @@
               <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
               <div class="product-info">
                 <h3>{{ product.name }}</h3>
-                <p>出售价格：￥{{ product.price }}</p>
-                <p>出租价格：￥{{ product.rentalPrice }}</p>
-                <p>出售库存：{{ product.stock }}</p>
-                <p>出租库存：{{ product.rentalStock }}</p>
+                <p>价格：￥{{ product.price }}</p>
+                <p>库存：{{ product.stock }}</p>
               </div>
               <button @click.stop="removeFromFavorites(product.id)" class="remove-button">移除收藏</button>
             </div>
@@ -66,28 +64,30 @@
                 <img :src="getProductImageUrl(product.imagePath)" alt="商品图片" class="product-image" />
                 <div class="product-info">
                   <h3>{{ product.name }}</h3>
-                  <p>出售价格：￥{{ product.price }}</p>
-                  <p>出租价格：￥{{ product.rentalPrice }}</p>
-                  <p>出售库存：{{ product.stock }}</p>
-                  <p>出租库存：{{ product.rentalStock }}</p>
+                  <p>价格：￥{{ product.price }}</p>
+                  <p>库存：{{ product.stock }}</p>
                 </div>
                 <div class="Stock-input" @click.stop>
                 <!-- 添加库存数量输入框 -->
                 <input 
                   type="number" 
                   v-model="product.addStocks" 
-                  placeholder="调整库存数量" 
+                  min="1" 
+                  placeholder="补充库存数量" 
                 />
                 <!-- 减少库存数量输入框 -->
                 <input 
                   type="number" 
                   v-model="product.lessStocks" 
-                  placeholder="调整库存数量" 
+                  min="1" 
+                  placeholder="减少库存数量" 
                 />
               </div>
               <div class="buttonInput" >
-                <button @click.stop="adjustSellStock(product.id, product.addStocks)" class="Stock-button">调整出售库存</button>
-                <button @click.stop="adjustRentStock(product.id, product.lessStocks)" class="Stock-button">调整出租库存</button>
+                <!-- 补充库存按钮 -->
+                <button @click.stop="addStock(product.id, product.addStocks)" class="Stock-button">补充库存</button>
+                <!-- 减少库存按钮 -->
+                <button @click.stop="lessStock(product.id, product.lessStocks)" class="Stock-button">减少库存</button>
               </div>
                 
                 <button @click.stop="removeProduct(product.id)" class="remove-button">下架</button>
@@ -110,7 +110,7 @@
               <select id="consumerOrderType" v-model="filters.orderType" class="filter-select">
                 <option value="">全部</option>
                 <option value="PURCHASE">购买订单</option>
-                <option value="RENTAL">出租订单</option>
+                <option value="RENTAL">租借订单</option>
               </select>
 
               <label for="consumerOrderStatus">订单状态：</label>
@@ -128,16 +128,54 @@
               <button @click="applyFilters" class="filter-button">筛选</button>
             </div>
 
-            <!-- 订单列表 -->
+            <!-- 消费订单列表 -->
             <div v-if="consumerOrders.length > 0" class="order-list">
               <div v-for="order in consumerOrders" :key="order.id" class="order-item">
+                <img :src="getProductImageUrl(order.imagePath)" alt="商品图片" class="order-image" />
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId }}</p>
-                <p>购买数量：{{ order.quantity }}</p>
-                <p>总价：￥{{ order.totalPrice }}</p>
-                <p>状态：{{ order.orderStatus }}</p>
-                <p>地址：{{ order.address }}</p>
+
+                <!-- 动态显示字段 -->
+                <template v-if="order.orderType === 'PURCHASE'">
+                  <p>购买数量：{{ order.quantity }}</p>
+                  <p>总价：￥{{ order.totalPrice }}</p>
+                </template>
+                <template v-else-if="order.orderType === 'RENTAL'">
+                  <p>租借数量：{{ order.quantity }}</p>
+                  <p>总价（含押金￥{{order.deposit}}）：￥{{ order.totalPrice + order.deposit }}</p>
+                  <p>租借天数：{{ order.rentalDurationDays }} 天</p>
+                  <p>
+                    租借时期：
+                    <span v-if="order.rentalStart && order.rentalEnd">
+                      {{ order.rentalStart }} 至 {{ order.rentalEnd }}
+                    </span>
+                    <span v-else>
+                      买家还未收货！
+                    </span>
+                  </p>
+                </template>
+
+                <p>订单状态：{{ getOrderStatusText(order.orderStatus) }}</p>
+                <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
+
+                <button
+                  v-if="order.orderStatus === 'SHIPPED'"
+                  @click="confirmDelivery(order)"
+                  class="order-action-button"
+                >
+                  确认收货
+                </button>
+
+                <button
+                  v-if="order.orderStatus === 'DELIVERED'&& order.orderType === 'RENTAL'"
+                  @click="returnOrder(order)"
+                  class="action-button"
+                >
+                  我要退还
+                </button>
+
+
               </div>
             </div>
             <div v-else>
@@ -161,9 +199,13 @@
               <label for="storeOrderStatus">订单状态：</label>
               <select id="storeOrderStatus" v-model="filter.orderStatus" class="filter-select">
                 <option value="">全部</option>
-                <option v-for="status in orderStatusOptions" :key="status" :value="status">
-                  {{ status }}
-                </option>
+                <option value="PENDING">待支付</option>
+                <option value="PAID">已支付</option>
+                <option value="SHIPPED">已发货</option>
+                <option value="DELIVERED">已收货</option>
+                <option value="CANCELLED">已取消</option>
+                <option value="RETURNED">已回货</option>
+                <option value="MERCHANT_CONFIRMED">商家确认</option>
               </select>
 
               <button @click="fetchSellerOrders" class="filter-button">筛选</button>
@@ -172,15 +214,51 @@
             <!-- 店铺订单列表 -->
             <div v-if="sellerOrders.length > 0" class="order-list">
               <div v-for="order in sellerOrders" :key="order.id" class="order-item">
+
+                <img :src="getProductImageUrl(order.imagePath)" alt="商品图片" class="order-image" />
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId || 'N/A' }}</p>
-                <p>订单类型：{{ order.orderType }}</p>
-                <p>购买数量：{{ order.quantity || 'N/A' }}</p>
-                <p>租赁时长：{{ order.rentalDurationDays || 'N/A' }} 天</p>
-                <p>总价：￥{{ order.totalPrice }}</p>
-                <p>状态：{{ order.orderStatus }}</p>
-                <p>地址：{{ order.address }}</p>
+
+                <!-- 动态显示字段 -->
+                <template v-if="order.orderType === 'PURCHASE'">
+                  <p>购买数量：{{ order.quantity }}</p>
+                  <p>总价：￥{{ order.totalPrice }}</p>
+                </template>
+                <template v-else-if="order.orderType === 'RENTAL'">
+                  <p>租借数量：{{ order.quantity }}</p>
+                  <p>总价（含押金￥{{order.deposit}}）：￥{{ order.totalPrice + order.deposit }}</p>
+                  <p>租借天数：{{ order.rentalDurationDays }} 天</p>
+                  <p>
+                    租借时期：
+                    <span v-if="order.rentalStart && order.rentalEnd">
+                      {{ order.rentalStart }} 至 {{ order.rentalEnd }}
+                    </span>
+                    <span v-else>
+                      买家还未收货！
+                    </span>
+                  </p>
+                </template>
+
+                <p>订单状态：{{getOrderStatusText(order.orderStatus)}}</p>
+                <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
+
+                <button
+                  v-if="order.orderStatus === 'PAID'"
+                  @click="shipOrder(order)"
+                  class="order-action-button"
+                >
+                  发货
+                </button>
+
+                <button
+                  v-if="order.orderStatus === 'RETURNED'&& order.orderType === 'RENTAL'"
+                  @click="confirmReturn(order)"
+                  class="action-button"
+                >
+                  商家确认
+                </button>
+
               </div>
             </div>
             <div v-else>
@@ -213,7 +291,7 @@
               </div>
               <div class="form-group-price">
                 <label for="price">出租价格：</label>
-                <input type="number" id="price" step="0.01" v-model="newProduct.rental_price" required />
+                <input type="number" id="price" v-model="newProduct.rental_price" required />
               </div>
             </div>
 
@@ -295,10 +373,9 @@ export default {
       newProduct: {
         name: "",
         price: 0,
-        rental_price: 0,
         stock: 0,
-        rental_stock: 0,
         description: "",
+        imageUrl: "",
       },
       consumerOrders: [], // 存储消费订单
       sellerOrders: [], // 店铺订单列表
@@ -321,8 +398,8 @@ export default {
         orderStatus: "", // 店铺订单筛选状态
       },
 
-      messages: [], //初始化消息数组
-      userInput:"", //用户输入内容
+      messages: [],
+      userInput:"",
     };
   },
   methods: {
@@ -341,7 +418,7 @@ export default {
     // 获取收藏商品数据
     async fetchFavorites() {
       try {
-        const response = await axios.get(`/api/carts/find/${this.user.id}`);
+        const response = await axios.get(`/api/carts/${this.user.id}`);
         if (response.status === 200) {
           this.favoriteProducts = response.data; 
         } else {
@@ -356,7 +433,7 @@ export default {
     // 移除收藏
     async removeFromFavorites(productId) {
       try {
-        const response = await axios.put(`/api/carts/toggle/${this.user.id}/${productId}`);
+        const response = await axios.delete(`/api/carts/${this.user.id}/${productId}`);
         if (response.status === 200) {
           this.favoriteProducts = this.favoriteProducts.filter(product => product.id !== productId);
           alert("已移除收藏");
@@ -418,10 +495,10 @@ export default {
       }
     },
     // 增加库存
-    async adjustSellStock(productId, quantity) {
+    async addStock(productId, quantity) {
       try {
         console.log(productId, quantity);
-        const response = await axios.post(`/api/products/adjustSellStock`, {
+        const response = await axios.post(`/api/products/addStock`, {
           productId: productId,
           quantity: quantity
         });
@@ -430,22 +507,22 @@ export default {
           this.products = this.products.map(product =>
             product.id === productId ? updatedProduct : product
           ); // 更新产品列表中的库存信息
-          alert("出售的库存已调整");
+          alert("库存已增加");
           this.fetchProducts();
           this.setActiveTab('products');
         } else {
-          alert("调整库存失败");
+          alert("增加库存失败");
         }
       } catch (error) {
-        console.error("调整库存时出错", error);
-        alert("调整库存失败");
+        console.error("增加库存时出错", error);
+        alert("增加库存失败");
       }
     },
     // 减少库存
-    async adjustRentStock(productId, quantity) {
+    async lessStock(productId, quantity) {
       try {
         console.log(productId, quantity);
-        const response = await axios.post(`/api/products/adjustRentStock`, {
+        const response = await axios.post(`/api/products/lessStock`, {
           productId: productId,
           quantity: quantity
         });
@@ -454,15 +531,15 @@ export default {
           this.products = this.products.map(product =>
             product.id === productId ? updatedProduct : product
           ); // 更新产品列表中的库存信息
-          alert("出租库存已调整");
+          alert("库存已减少");
           this.fetchProducts();
           this.setActiveTab('products');
         } else {
-          alert("调整库存失败");
+          alert("减少库存失败");
         }
       } catch (error) {
-        console.error("调整库存时出错", error);
-        alert("调整库存失败");
+        console.error("减少库存时出错", error);
+        alert("减少库存失败");
       }
     },
 
@@ -518,38 +595,41 @@ export default {
     // 上架商品
     async addProduct() {
       if (this.newProduct.name && this.newProduct.price && this.newProduct.rental_price 
-          && (this.newProduct.stock || this.newProduct.rental_stock) 
-          && this.newProduct.description) {
+          && this.newProduct.stock && this.newProduct.rental_stock 
+          && this.newProduct.description && this.newProduct.imageUrl) {
         const formData = new FormData();
-        formData.append('name', this.newProduct.name);
-        formData.append('price', this.newProduct.price); 
-        formData.append('rental_price', this.newProduct.rental_price);
-        formData.append('stock', this.newProduct.stock);
-        formData.append('rental_stock', this.newProduct.rental_stock);
-        formData.append('description', this.newProduct.description);
-        formData.append('seller_id', this.user.id);
-        formData.append('is_active', true); 
-        
 
-        const file = this.$refs.image.files[0];
+        // 添加商品信息到 FormData
+        formData.append("name", this.newProduct.name);
+        formData.append("price", this.newProduct.price);
+        formData.append("rental_price", this.newProduct.rental_price);
+        formData.append("stock", this.newProduct.stock);
+        formData.append("rental_stock", this.newProduct.rental_stock);
+        formData.append("description", this.newProduct.description);
+        formData.append("seller_id", this.user.id); 
+        formData.append("is_active", 1); 
+
+        // 添加图片到 FormData
+        const file = this.$refs.image.files[0]; // 使用 ref 获取文件
         if (file) {
-          formData.append("file", file);
+          formData.append("image", file);
         } else {
           alert("请上传商品图片");
           return;
         }
 
         try {
-          for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-          }
-          const response = await axios.post('/api/products/addProduct', formData);
-
+          // 发送请求到后端
+          const response = await axios.post('/api/products/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
 
           if (response.status === 200) {
-            alert("商品上传成功");
-            this.resetNewProduct(); 
-            this.fetchProducts();  
+            alert(response.data);  // 商品上传成功提示
+            this.resetNewProduct(); // 重置表单
+            this.fetchProducts();  // 上传成功后刷新商品列表
           } else {
             alert("上传失败，请稍后再试");
           }
@@ -561,7 +641,6 @@ export default {
         alert("请填写所有商品信息");
       }
     },
-
 
     // 重置上架商品表单
     resetNewProduct() {
@@ -576,6 +655,11 @@ export default {
       };
       // 清空图片输入
       this.$refs.image.value = ""; 
+    },
+
+    // 点击商品时执行的函数
+    showProductId(productId) {
+      console.log("点击的商品ID:", productId);  // 输出商品ID
     },
 
     // 调用接口获取用户信息
@@ -604,7 +688,17 @@ export default {
             },
           });
           if (response.status === 200) {
+            console.log("消费订单数据：", response.data);
             this.consumerOrders = response.data;
+            // 提取订单ID，按降序排列并取前10个
+            const recentOrderIds = this.consumerOrders
+              .map(order => order.id)
+              .sort((a, b) => b - a) // 按订单号降序排序
+              .slice(0, 10); // 取前10个订单号
+
+            // 检查每个订单状态并更新
+            await Promise.all(recentOrderIds.map(orderId => this.updateOrderStatus(orderId)));
+
           } else {
             alert("获取消费订单失败！");
           }
@@ -649,19 +743,118 @@ export default {
 
         const response = await axios.get("/api/orders/seller/filter", { params });
         this.sellerOrders = response.data;
+
+        // 提取订单ID，按降序排列并取前10个
+        const recentOrderIds = this.sellerOrders
+          .map(order => order.id)
+          .sort((a, b) => b - a) // 按订单号降序排序
+          .slice(0, 10); // 取前10个订单号
+
+        // 检查每个订单状态并更新
+        await Promise.all(recentOrderIds.map(orderId => this.updateOrderStatus(orderId)));
+
       } catch (error) {
         console.error("获取店铺订单失败", error);
         alert("获取店铺订单失败，请稍后再试");
       }
     },
     
+    // 将订单状态转换为中文
+    getOrderStatusText(status) {
+      const statusMap = {
+        PENDING: "待支付",
+        PAID: "已支付",
+        SHIPPED: "已发货",
+        DELIVERED: "已收货",
+        CANCELLED: "已取消",
+        RETURNED: "已回货",
+        MERCHANT_CONFIRMED: "商家确认",
+      };
+      return statusMap[status] || "未知状态";
+    },
 
+    async confirmDelivery(order) {
+      try {
+        const response = await axios.patch(`/api/orders/${order.id}/confirm-delivery`);
+        if (response.status === 200) {
+          alert("确认收货成功！");
+          // 更新订单状态为 DELIVERED
+          order.orderStatus = "DELIVERED";
+        } else {
+          alert("确认收货失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("确认收货时出错：", error);
+        alert("确认收货失败，请稍后再试！");
+      }
+    },
 
+    async returnOrder(order) {
+      try {
+        const response = await axios.patch(`/api/orders/${order.id}/return`);
+        if (response.status === 200) {
+          alert("退还订单成功！");
+          order.orderStatus = "RETURNED";
+        } else {
+          alert("退还订单失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("退还订单时出错：", error);
+        alert("退还订单失败，请稍后再试！");
+      }
+    },
 
+    // 发货逻辑
+    async shipOrder(order) {
+      try {
+        const response = await axios.patch(`/api/orders/seller/${order.id}/ship`);
+        if (response.status === 200) {
+          alert("发货成功！");
+          order.orderStatus = "SHIPPED";
+        } else {
+          alert("发货失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("发货时出错：", error);
+        alert("发货失败，请稍后再试！");
+      }
+    },
 
+    // 商家确认逻辑
+    async confirmReturn(order) {
+      try {
+        const response = await axios.patch(`/api/orders/seller/${order.id}/merchant-confirm`);
+        if (response.status === 200) {
+          alert("确认成功！");
+          order.orderStatus = "MERCHANT_CONFIRMED";
+        } else {
+          alert("确认失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("确认时出错：", error);
+        alert("确认失败，请稍后再试！");
+      }
+    },
 
-  //发送消息给AI
-  sendMessage() {
+    async updateOrderStatus(orderId) {
+      try {
+        const response = await axios.get("/api/orders/queryStatus", {
+          params: {
+            orderId: orderId,
+          },
+        });
+
+        if (response.data.status === "success") {
+          console.log(`订单 ${orderId} 状态更新成功: ${response.data.message}`);
+        } else {
+          console.warn(`订单 ${orderId} 状态更新失败: ${response.data.message}`);
+        }
+      } catch (error) {
+        console.error(`更新订单 ${orderId} 状态时出错:`, error);
+      }
+    },
+
+    async sendMessage() {
       if (this.userInput.trim() === "") {
         alert("请输入内容后发送！");
         return;
@@ -673,16 +866,33 @@ export default {
         content: this.userInput,
       });
 
-      // 清空输入框
+      // 暂存用户输入并清空输入框
+      const inputMessage = this.userInput;
       this.userInput = "";
 
-      // 模拟 AI 回复
-      setTimeout(() => {
+      try {
+        // 向后端发送请求
+        const response = await axios.post("http://localhost:8080/api/chat", null, {
+          params: {
+            message: inputMessage,
+          },
+        });
+
+        // 提取后端返回的 content
+        const content = response.data.choices[0].message.content;
+
+        // 添加 AI 的回复到消息列表
         this.messages.push({
           sender: "ai",
-          content: "你好！你好！",
+          content: content,
         });
-      }, 1000); // 模拟延迟
+      } catch (error) {
+        console.error("请求失败:", error);
+        this.messages.push({
+          sender: "ai",
+          content: "抱歉，我无法连接到服务器，请稍后重试。",
+        });
+      }
     },
 
 
@@ -702,6 +912,8 @@ export default {
     this.fetchUserInfo();
   }
 };
+
+
 </script>
   <style scoped>
   html,
@@ -919,7 +1131,7 @@ button:hover {
     border: none;
     padding: 10px;
     font-size: 14px;
-    width: 120px;
+    width: 100px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-right: 10px;
@@ -1093,8 +1305,31 @@ button:hover {
     margin: 5px 0;
   }
 
+  .order-image {
+    width: 140px;
+    height: 80px;
+    object-fit: cover; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 0px;
+  }
 
-    
+  .order-action-button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #6a2af5;
+    color: white;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .order-action-button:hover {
+    background-color: #4c13fa;
+  }
+
   /* ai界面 */
 .ai-chat-container {
   display: flex;
