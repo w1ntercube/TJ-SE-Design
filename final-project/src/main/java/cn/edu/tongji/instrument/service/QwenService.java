@@ -2,7 +2,7 @@ package cn.edu.tongji.instrument.service;
 
 
 import cn.edu.tongji.instrument.dto.Message;
-import cn.edu.tongji.instrument.dto.RequestBody;
+import cn.edu.tongji.instrument.dto.QwenRequestBody;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 @Service
-public class ChatService {
+public class QwenService {
 
     @Value("${dashscope.api.key}")
     private String apiKey;
@@ -28,7 +28,7 @@ public class ChatService {
     public String sendMessage(String userMessage) {
         try {
             // 构建请求体
-            RequestBody requestBody = new RequestBody(
+            QwenRequestBody qwenRequestBody = new QwenRequestBody(
                     "qwen-plus",
                     new Message[] {
                             new Message("system", "你是一个乐器知识相关的专家，只能回答与乐器知识相关的问题。" +
@@ -39,7 +39,7 @@ public class ChatService {
             );
 
             // 将请求体转换为 JSON
-            String jsonInputString = gson.toJson(requestBody);
+            String jsonInputString = gson.toJson(qwenRequestBody);
 
             // 创建 URL 对象
             URL url = new URL(apiUrl);

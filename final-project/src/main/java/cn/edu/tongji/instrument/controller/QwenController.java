@@ -1,18 +1,18 @@
 package cn.edu.tongji.instrument.controller;
 
-import cn.edu.tongji.instrument.service.ChatService;
+import cn.edu.tongji.instrument.service.QwenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/chat")
-public class ChatController {
+public class QwenController {
 
     @Autowired
-    private ChatService chatService;
+    private QwenService qwenService;
 
     @PostMapping
     public String chat(@RequestParam String message) {
-        return chatService.sendMessage(message);
+        return qwenService.sendMessage(message);
     }
 }

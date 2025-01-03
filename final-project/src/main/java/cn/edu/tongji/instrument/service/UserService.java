@@ -150,5 +150,16 @@ public class UserService {
         }).orElseThrow(() -> new RuntimeException("用户未找到"));
 
     }
+
+    public User findByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhone(phoneNumber)
+                .orElseThrow(() -> new RuntimeException("用户不存在: " + phoneNumber));
+    }
+
+    public void updatePassword(String phoneNumber, String newPassword) {
+        User user = findByPhoneNumber(phoneNumber);
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
 }
 

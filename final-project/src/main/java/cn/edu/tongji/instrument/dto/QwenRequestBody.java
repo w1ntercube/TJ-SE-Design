@@ -1,11 +1,11 @@
 package cn.edu.tongji.instrument.dto;
 
 
-public class RequestBody {
+public class QwenRequestBody {
     private String model;
     private Message[] messages;
 
-    public RequestBody(String model, Message[] messages) {
+    public QwenRequestBody(String model, Message[] messages) {
         this.model = model;
         this.messages = messages;
     }
