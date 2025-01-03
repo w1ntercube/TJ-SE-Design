@@ -13,8 +13,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long>
 {
     // 根据卖家查找商品
-    List<Product> findBySeller(User seller);
-
     List<Product> findBySellerId(Long sellerId);
+    List<Product> findByIsActiveTrue();
 }
 

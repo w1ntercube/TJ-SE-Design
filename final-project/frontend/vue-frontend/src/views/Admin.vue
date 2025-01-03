@@ -23,7 +23,6 @@
         <h2 class="Admin-title">{{user.username}}</h2>
       </div>
 
-      <!--管理用户-->
       <div v-if="activeTab === 'User'">
           <h2 class ="Admin-user-title">用户列表</h2>
           <div v class="Admin-user-list">
@@ -45,35 +44,6 @@
           </div>
       </div>
 
-
-      <!--管理商品-->
-
-
-      <!--管理评论-->
-      <div v-if="activeTab === 'Review'">
-        <div class="right-box">
-        <!-- 评论列表 -->
-        <div class="comment-list">
-          <h2>管理评论</h2>
-          <div
-            class="comment-item"
-            v-for="review in reviews"
-            :key="review.id"
-          >
-            <div class="comment-header">
-              <img :src="review.avatarUrl" alt="用户头像" class="user-avatar" />
-              <h4 class="comment-username">{{ review.username }}</h4>
-              <span class="comment-rating">评分：({{ review.rating }}⭐)</span>
-              <button class="delete-comment-button" @click="deleteComment(review.id)">删除</button>
-            </div>
-            <p class="comment-content">{{ review.comment }}</p>
-            <div class="comment-bottom">
-              <span class="timestamp">{{ review.createdAt }}</span>
-            </div>
-          </div>
-        </div>
-        </div> 
-      </div>
 
     </div>
 
@@ -98,7 +68,6 @@ export default {
       activeTab: "Admin", // 默认选中"个人中心"选项卡
 
       Users: [], //用户列表
-      reviews: [], //评论列表
     };
   },
   methods: {
@@ -107,9 +76,6 @@ export default {
       if (tab === "User") {
         this.fetchUsers(); // 获取用户列表
       } 
-      if(tab === "Review"){
-        this.fetchReviews(); //获取评论列表
-      }
     },
 
 
@@ -135,38 +101,6 @@ export default {
       }
     },
 
-    //调用接口获取评论列表
-    fetchReviews() {
-        axios
-          .get(`/api/reviews/all`)
-          .then((response) => {
-            this.reviews = response.data.map((review) => ({
-              ...review,
-              avatarUrl: review.avatarUrl
-                ? `http://localhost:8080${review.avatarUrl}`
-                : require('@/Resources/default-avatar.jpg'), // 默认头像路径
-            }));
-          })
-          .catch((error) => {
-            console.error("获取商品评论失败:", error);
-          });
-      },
-
-    //删除评论列表
-    async deleteComment(reviewId){
-      try {
-      // 发送 DELETE 请求到后端
-      const response = await axios.delete(`/api/reviews/AdminDelete/${reviewId}`);
-      if (response.status === 200) {
-        // 删除成功后，从当前评论列表中移除该评论
-        this.reviews = this.reviews.filter((review) => review.id !== reviewId);
-        alert("评论删除成功");
-      }
-    } catch (error) {
-      console.error("删除评论失败:", error);
-      alert("删除评论失败，请重试");
-    }
-    },
 
 
     // 点击商品时执行的函数
@@ -448,95 +382,4 @@ export default {
   background-color: #7c42f5; /* 悬停时背景颜色 */
 }
   /*用户列表界面 */
-
-
-  /*  评论界面   */
-
-  .right-box .comment-item {
-      /* 每个评论框的外观 */
-      background-color: #5929caab;
-      border-radius: 8px;
-      border: 1px solid #ffffff;
-      padding: 10px;
-      margin-bottom: 10px; /* 相邻评论间距 */
-      
-      /* 让内部结构可以灵活摆放 */
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* 去掉最后一个评论的下边框和间距 */
-    .right-box .comment-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-    }
-
-    /* 头部区域：左侧用户名 + 右侧评分 */
-    .comment-header {
-      display: flex;
-      align-items: center; /* 头像与用户名垂直居中 */
-      gap: 5px; /* 控制头像与名字之间的间距 */
-      position: relative; /* 为了绝对定位按钮 */
-    }
-    .user-avatar {
-      width: 40px; /* 调整头像宽度 */
-      height: 40px; /* 调整头像高度 */
-      border-radius: 50%; /* 确保头像圆形 */
-      margin-right: 5px; /* 减小与用户名的间距 */
-      object-fit: cover; /* 确保图片裁剪比例正确 */
-    }
-    .right-box .comment-bottom {
-      display: flex;
-      justify-content: flex-end; /* 内容靠右对齐 */
-      align-items: center;
-      margin-top: 10px;          /* 与上方内容保持一点间距 */
-    }
-    /* 时间戳样式 */
-    .timestamp {
-      font-size: 14px;
-      color: #dedede;              /* 比正文更浅一些，突出时间为次要信息 */
-      /* 如果想绝对定位到右下角，可以改成：
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-        但需确保父元素 .comment-item 有 position: relative; 
-      */
-    }
-    /* 用户名（左上角） */
-    .right-box .comment-username {
-      color: #9fff22;
-      font-size: 20px;
-      font-weight: bold;
-      margin: 0; /* 去掉默认 margin */
-    }
-
-    /* 评分（右上角） */
-    .right-box .comment-rating {
-      color: #16ef9c;
-      font-size: 20px;
-    }
-
-    /* 评论内容（左对齐，放在头部下方） */
-    .right-box .comment-content {
-      margin-top: 10px;
-      color: #ffffff;
-      text-align: left;
-      line-height: 1.5;
-    }
-
-    .delete-comment-button {
-      background-color: transparent; /* 背景透明 */
-      color: red; /* 删除按钮颜色 */
-      border: none; /* 去掉边框 */
-      font-size: 14px; /* 调整字体大小 */
-      cursor: pointer; /* 鼠标变为手型 */
-      top: 0; /* 距离顶部对齐 */
-      position: absolute; /* 绝对定位 */
-      right: 10px; /* 距离右侧对齐 */
-    }
-
-    .delete-comment-button:hover {
-      color: darkred; /* 悬停时颜色变化 */
-    }
-   /*  评论界面   */
 </style>

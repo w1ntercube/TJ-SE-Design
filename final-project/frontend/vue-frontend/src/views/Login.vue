@@ -94,16 +94,15 @@
       
       // 登录成功逻辑
       alert(`欢迎回来，${response.data.username}！`);
+      // 保存用户信息到 localStorage 或 Vuex（可选）
+      localStorage.setItem("user", JSON.stringify(response.data));
 
       // 跳转到主页或其他页面
       this.$router.push("/home");
     } catch (error) {
       // 登录失败逻辑
-      if (error.response && error.response.status === 403) 
-      {
-        this.errorMessage = '账户已被封禁';
-      }
-
+      if (error.response && error.response.status === 403) {
+        this.errorMessage = '账户已被封禁';}
       if (error.response && error.response.status === 401) {
         alert("用户名或密码错误！");
       } else {

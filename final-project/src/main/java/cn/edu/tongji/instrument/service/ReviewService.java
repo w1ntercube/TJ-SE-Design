@@ -76,21 +76,4 @@ public class ReviewService {
     public void delete(Long reviewId) {
         reviewRepository.deleteById(reviewId);
     }
-
-    //返回所有评论
-    public List<ReviewDTO> getAllReviews() {
-        List<Review> reviews = reviewRepository.findAll();
-        return reviews.stream()
-                .map(review -> {
-                    // 根据 userId 查询用户名
-                    String username = userRepository.findById(review.getUserId())
-                            .map(User::getUsername) // 提取用户名
-                            .orElse("Unknown User"); // 如果找不到用户，默认用户名
-                    String avatarUrl = userRepository.findById(review.getUserId())
-                            .map(User::getAvatarUrl)
-                            .orElse("Default-avatar");
-                    return new ReviewDTO(review, username, avatarUrl); // 构造 DTO
-                })
-                .collect(Collectors.toList());
-    }
 }

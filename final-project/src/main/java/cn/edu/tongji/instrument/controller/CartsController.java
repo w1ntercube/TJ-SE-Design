@@ -34,33 +34,9 @@ public class CartsController {
     @Autowired
     private ProductService productService;
 
-    // 添加商品到购物车
-    @PostMapping
-    public ResponseEntity<String> addCart(
-            @RequestParam("userId") Long userId,
-            @RequestParam("productId") Long productId,
-            @RequestParam(value = "quantity", defaultValue = "1") int quantity) {
 
-        // 验证用户是否存在
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户不存在");
-        }
-
-        // 验证商品是否存在
-        Optional<Product> optionalProduct = productService.getProductById(productId);
-        if (optionalProduct.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("商品不存在");
-        }
-        // 提取 Optional 中的实际 Product 对象
-        Product product = optionalProduct.get();
-        // 添加商品到购物车
-        cartsService.addToCart(user, product, quantity);
-
-        return ResponseEntity.ok("商品已成功添加到购物车");
-    }
     // 根据用户ID查询收藏的商品
-    @GetMapping("/{userId}")
+    @GetMapping("/find/{userId}")
     public ResponseEntity<List<ProductDTO>> getFavoritesByUserId(@PathVariable("userId") Long userId) {
         User user = userService.getUserById(userId);
         if (user == null) {
@@ -69,36 +45,52 @@ public class CartsController {
 
         List<ProductDTO> favoriteProducts = new ArrayList<>(cartsService.getFavoriteProductsByUser(user));
 
-        return ResponseEntity.ok(favoriteProducts);
+        List<ProductDTO> activeProducts = new ArrayList<>(); // 初始化 activeProducts
+        for(ProductDTO productDTO : favoriteProducts) {
+            if(productDTO.getIsActive()){
+                activeProducts.add(productDTO);
+            }
+        }
+        return ResponseEntity.ok(activeProducts);
     }
-
-
-
-
-    // 移除收藏的商品
-    @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<String> removeFromFavorites(
+    // 改变喜欢状态
+    @PutMapping("/toggle/{userId}/{productId}")
+    public ResponseEntity<Boolean> toggleFavorite(
             @PathVariable("userId") Long userId,
             @PathVariable("productId") Long productId) {
 
-        // 验证用户是否存在
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户不存在");
-        }
+        boolean isExist = cartsService.isCartsExist(userId, productId);
 
-        // 验证商品是否存在
-        Optional<Product> optionalProduct = productService.getProductById(productId);
-        if (optionalProduct.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("商品不存在");
-        }
+        if (isExist) {
 
-        Product product = optionalProduct.get();
-        boolean removed = cartsService.removeFromCart(user, product);
-        if (removed) {
-            return ResponseEntity.ok("商品已成功从收藏移除");
+            User user = userService.getUserById(userId);
+            Optional<Product> optionalProduct = productService.getProductById(productId);
+            Product product = optionalProduct.get();
+
+
+            cartsService.removeFromCart(user, product);
+
+            return ResponseEntity.ok(false);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("移除失败，商品可能不在收藏列表中");
+            User user = userService.getUserById(userId);
+            Optional<Product> optionalProduct = productService.getProductById(productId);
+            Product product = optionalProduct.get();
+            // 如果商品不存在，则添加
+
+            cartsService.addToCart(user, product);
+
+            return ResponseEntity.ok(true);
+
         }
     }
+    // 查看是否存在
+    @GetMapping("/exists/{userId}/{productId}")
+    public ResponseEntity<Boolean> checkIfCartsExists(
+            @PathVariable("userId") Long userId,
+            @PathVariable("productId") Long productId) {
+
+        boolean exists = cartsService.isCartsExist(userId, productId);
+        return ResponseEntity.ok(exists);
+    }
+
 }

@@ -64,23 +64,5 @@ public class ReviewController {
         return ResponseEntity.ok("Review deleted successfully");
     }
 
-    //返回所有评论信息
-    @GetMapping("/all")
-    public ResponseEntity<List<ReviewDTO>> getAllReviews() {
-        List<ReviewDTO> allReviews = reviewService.getAllReviews();
-        if (allReviews.isEmpty()) {
-            return ResponseEntity.noContent().build(); // 如果没有评论，返回 204 No Content
-        }
-        return ResponseEntity.ok(allReviews); // 返回所有评论
-    }
-
-    //管理员删除评论
-    @DeleteMapping("/AdminDelete/{reviewId}")
-    public ResponseEntity<String> deleteReviewById(@PathVariable Long reviewId) {
-        // 删除评论
-        reviewService.delete(reviewId);
-        // 返回删除成功消息
-        return ResponseEntity.ok("Review deleted successfully");
-    }
 
 }
