@@ -131,6 +131,7 @@
             <!-- 消费订单列表 -->
             <div v-if="consumerOrders.length > 0" class="order-list">
               <div v-for="order in consumerOrders" :key="order.id" class="order-item">
+                <img :src="getProductImageUrl(order.imagePath)" alt="商品图片" class="order-image" />
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId }}</p>
 
@@ -141,12 +142,20 @@
                 </template>
                 <template v-else-if="order.orderType === 'RENTAL'">
                   <p>租借数量：{{ order.quantity }}</p>
-                  <p>总价（含押金）：￥{{ order.totalPrice }}</p>
+                  <p>总价（含押金￥{{order.deposit}}）：￥{{ order.totalPrice + order.deposit }}</p>
                   <p>租借天数：{{ order.rentalDurationDays }} 天</p>
-                  <p>租借时期：{{ order.rentalStart || 'N/A' }} 至 {{ order.rentalEnd || 'N/A' }}</p>
+                  <p>
+                    租借时期：
+                    <span v-if="order.rentalStart && order.rentalEnd">
+                      {{ order.rentalStart }} 至 {{ order.rentalEnd }}
+                    </span>
+                    <span v-else>
+                      买家还未收货！
+                    </span>
+                  </p>
                 </template>
 
-                <p>订单状态：{{ order.orderStatus }}</p>
+                <p>订单状态：{{ getOrderStatusText(order.orderStatus) }}</p>
                 <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
               </div>
@@ -172,9 +181,13 @@
               <label for="storeOrderStatus">订单状态：</label>
               <select id="storeOrderStatus" v-model="filter.orderStatus" class="filter-select">
                 <option value="">全部</option>
-                <option v-for="status in orderStatusOptions" :key="status" :value="status">
-                  {{ status }}
-                </option>
+                <option value="PENDING">待支付</option>
+                <option value="PAID">已支付</option>
+                <option value="SHIPPED">已发货</option>
+                <option value="DELIVERED">已收货</option>
+                <option value="CANCELLED">已取消</option>
+                <option value="RETURNED">已回货</option>
+                <option value="MERCHANT_CONFIRMED">商家确认</option>
               </select>
 
               <button @click="fetchSellerOrders" class="filter-button">筛选</button>
@@ -183,6 +196,8 @@
             <!-- 店铺订单列表 -->
             <div v-if="sellerOrders.length > 0" class="order-list">
               <div v-for="order in sellerOrders" :key="order.id" class="order-item">
+
+                <img :src="getProductImageUrl(order.imagePath)" alt="商品图片" class="order-image" />
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId || 'N/A' }}</p>
 
@@ -193,12 +208,20 @@
                 </template>
                 <template v-else-if="order.orderType === 'RENTAL'">
                   <p>租借数量：{{ order.quantity }}</p>
-                  <p>总价（含押金）：￥{{ order.totalPrice }}</p>
+                  <p>总价（含押金￥{{order.deposit}}）：￥{{ order.totalPrice + order.deposit }}</p>
                   <p>租借天数：{{ order.rentalDurationDays }} 天</p>
-                  <p>租借时期：{{ order.rentalStart || 'N/A' }} 至 {{ order.rentalEnd || 'N/A' }}</p>
+                  <p>
+                    租借时期：
+                    <span v-if="order.rentalStart && order.rentalEnd">
+                      {{ order.rentalStart }} 至 {{ order.rentalEnd }}
+                    </span>
+                    <span v-else>
+                      买家还未收货！
+                    </span>
+                  </p>
                 </template>
 
-                <p>订单状态：{{ order.orderStatus }}</p>
+                <p>订单状态：{{getOrderStatusText(order.orderStatus)}}</p>
                 <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
               </div>
@@ -682,7 +705,19 @@ export default {
       }
     },
     
-
+    // 将订单状态转换为中文
+    getOrderStatusText(status) {
+      const statusMap = {
+        PENDING: "待支付",
+        PAID: "已支付",
+        SHIPPED: "已发货",
+        DELIVERED: "已收货",
+        CANCELLED: "已取消",
+        RETURNED: "已回货",
+        MERCHANT_CONFIRMED: "商家确认",
+      };
+      return statusMap[status] || "未知状态";
+    },
 
 
 
@@ -1122,6 +1157,14 @@ button:hover {
     margin: 5px 0;
   }
 
+  .order-image {
+    width: 140px;
+    height: 80px;
+    object-fit: cover; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 0px;
+  }
 
     
   /* ai界面 */

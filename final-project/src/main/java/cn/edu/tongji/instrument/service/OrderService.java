@@ -3,22 +3,26 @@ package cn.edu.tongji.instrument.service;
 import cn.edu.tongji.instrument.entity.*;
 import cn.edu.tongji.instrument.entity.enums.OrderStatus;
 import cn.edu.tongji.instrument.repository.OrderRepository;
+import cn.edu.tongji.instrument.repository.ProductRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @Service
 public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
@@ -96,6 +100,12 @@ public class OrderService {
         map.put("address", order.getAddress());
         map.put("createdAt", order.getCreatedAt());
         map.put("orderType", "PURCHASE");
+
+        Product product = productRepository.findById(order.getProductId()).orElse(null);
+        if (product != null) {
+            map.put("imagePath", product.getImagePath());
+        }
+
         return map;
     }
 
@@ -116,6 +126,13 @@ public class OrderService {
         map.put("address", order.getAddress());
         map.put("createdAt", order.getCreatedAt());
         map.put("orderType", "RENTAL");
+        map.put("deposit", order.getDeposit());
+
+        Product product = productRepository.findById(order.getProductId()).orElse(null);
+        if (product != null) {
+            map.put("imagePath", product.getImagePath());
+        }
+
         return map;
     }
 }

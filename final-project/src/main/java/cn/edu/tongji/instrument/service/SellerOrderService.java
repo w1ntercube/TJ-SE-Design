@@ -82,6 +82,12 @@ public class SellerOrderService {
         map.put("address", order.getAddress());
         map.put("createdAt", order.getCreatedAt());
         map.put("orderType", "PURCHASE");
+
+        Product product = productRepository.findById(order.getProductId()).orElse(null);
+        if (product != null) {
+            map.put("imagePath", product.getImagePath());
+        }
+
         return map;
     }
 
@@ -101,6 +107,13 @@ public class SellerOrderService {
         map.put("address", order.getAddress());
         map.put("createdAt", order.getCreatedAt());
         map.put("orderType", "RENTAL");
+        map.put("deposit", order.getDeposit());
+
+        Product product = productRepository.findById(order.getProductId()).orElse(null);
+        if (product != null) {
+            map.put("imagePath", product.getImagePath());
+        }
+
         return map;
     }
 }
