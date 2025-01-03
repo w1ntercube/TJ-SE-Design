@@ -12,11 +12,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
-
 
     private final OrderService orderService;
     private final ProductRepository productRepository;
@@ -44,39 +44,22 @@ public class OrderController {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 
-    // 根据用户订单类型和状态筛选订单
+    /**
+     * 根据用户ID、订单类型和订单状态筛选订单
+     *
+     * @param userId 用户ID
+     * @param orderType 可选：订单类型（"PURCHASE" 或 "RENTAL"）
+     * @param orderStatus 可选：订单状态
+     * @return 筛选后的订单列表
+     */
     @GetMapping("/filter")
-    public ResponseEntity<List<Order>> getOrdersByUserAndFilters(
+    public ResponseEntity<List<Map<String, Object>>> getOrdersByUserAndFilters(
             @RequestParam Long userId,
             @RequestParam(required = false) String orderType,
             @RequestParam(required = false) OrderStatus orderStatus
     ) {
-        List<Order> orders = orderService.getOrdersByUserAndFilters(userId, orderType, orderStatus);
+        List<Map<String, Object>> orders = orderService.getOrdersByUserAndFilters(userId, orderType, orderStatus);
         return ResponseEntity.ok(orders);
     }
 
-
-    // 复用订单筛选接口：通过用户作为卖家的逻辑实现店铺订单查询
-    @GetMapping("/seller/filter")
-    public ResponseEntity<List<Order>> getSellerOrders(
-            @RequestParam Long sellerId, // 卖家ID
-            @RequestParam(required = false) String orderType,
-            @RequestParam(required = false) OrderStatus orderStatus
-    ) {
-        // 查询卖家相关的商品ID列表
-        List<Long> productIds = productRepository.findBySellerId(sellerId)
-                .stream()
-                .map(Product::getId)
-                .toList();
-
-        if (productIds.isEmpty()) {
-            // 如果卖家没有商品，直接返回空列表
-            return ResponseEntity.ok(Collections.emptyList());
-        }
-
-        // 使用现有的 Service 方法筛选订单
-        List<Order> orders = orderService.getOrdersByProductIdsAndFilters(productIds, orderType, orderStatus);
-
-        return ResponseEntity.ok(orders);
-    }
 }

@@ -2,80 +2,66 @@ package cn.edu.tongji.instrument.service;
 
 import cn.edu.tongji.instrument.entity.*;
 import cn.edu.tongji.instrument.entity.enums.OrderStatus;
-import cn.edu.tongji.instrument.repository.OrderRepository;
+import cn.edu.tongji.instrument.repository.ProductRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderService {
+public class SellerOrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
-
+    private final ProductRepository productRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
 
-    public OrderService(PurchaseOrderRepository purchaseOrderRepository,
-                        RentalOrderRepository rentalOrderRepository) {
+    public SellerOrderService(
+            ProductRepository productRepository,
+            PurchaseOrderRepository purchaseOrderRepository,
+            RentalOrderRepository rentalOrderRepository
+    ) {
+        this.productRepository = productRepository;
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.rentalOrderRepository = rentalOrderRepository;
     }
 
-    // 查询所有订单
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-    // 查询单个订单
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
-    }
-
-    // 更新订单状态
-    public Order updateOrderStatus(Long id, OrderStatus status) {
-        Order order = getOrderById(id);
-        order.setOrderStatus(status);
-        return orderRepository.save(order);
-    }
-
     /**
-     * 根据用户ID、订单类型和订单状态筛选订单
+     * 获取卖家订单（支持根据订单状态和订单种类筛选）
      *
-     * @param userId 用户ID
-     * @param orderType 可选：订单类型（"PURCHASE" 或 "RENTAL"）
+     * @param sellerId 卖家 ID
+     * @param orderType 可选：订单种类（"PURCHASE" 或 "RENTAL"）
      * @param orderStatus 可选：订单状态
-     * @return 筛选后的订单数据列表
+     * @return 卖家订单列表
      */
+    public List<Map<String, Object>> getSellerOrders(Long sellerId, String orderType, OrderStatus orderStatus) {
+        // 查找卖家所有商品的 ID
+        List<Long> productIds = productRepository.findBySellerId(sellerId)
+                .stream()
+                .map(Product::getId)
+                .collect(Collectors.toList());
 
-    /**
-     * 根据用户ID、订单类型和订单状态筛选订单
-     */
-    public List<Map<String, Object>> getOrdersByUserAndFilters(Long userId, String orderType, OrderStatus orderStatus) {
+        if (productIds.isEmpty()) {
+            return Collections.emptyList(); // 如果没有商品，直接返回空列表
+        }
+
         List<Map<String, Object>> result = new ArrayList<>();
 
-        // 处理购买订单
+        // 查询购买订单
         if (orderType == null || "PURCHASE".equalsIgnoreCase(orderType)) {
             List<PurchaseOrder> purchaseOrders = (orderStatus == null)
-                    ? purchaseOrderRepository.findByUserId(userId)
-                    : purchaseOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus);
+                    ? purchaseOrderRepository.findByProductIdIn(productIds)
+                    : purchaseOrderRepository.findByProductIdInAndOrderStatus(productIds, orderStatus);
 
             purchaseOrders.forEach(order -> result.add(convertPurchaseOrderToMap(order)));
         }
 
-        // 处理租赁订单
+        // 查询租赁订单
         if (orderType == null || "RENTAL".equalsIgnoreCase(orderType)) {
             List<RentalOrder> rentalOrders = (orderStatus == null)
-                    ? rentalOrderRepository.findByUserId(userId)
-                    : rentalOrderRepository.findByUserIdAndOrderStatus(userId, orderStatus);
+                    ? rentalOrderRepository.findByProductIdIn(productIds)
+                    : rentalOrderRepository.findByProductIdInAndOrderStatus(productIds, orderStatus);
 
             rentalOrders.forEach(order -> result.add(convertRentalOrderToMap(order)));
         }
@@ -98,7 +84,6 @@ public class OrderService {
         map.put("orderType", "PURCHASE");
         return map;
     }
-
 
     /**
      * 转换租赁订单为统一格式

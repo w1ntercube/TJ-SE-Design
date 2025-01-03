@@ -128,15 +128,26 @@
               <button @click="applyFilters" class="filter-button">筛选</button>
             </div>
 
-            <!-- 订单列表 -->
+            <!-- 消费订单列表 -->
             <div v-if="consumerOrders.length > 0" class="order-list">
               <div v-for="order in consumerOrders" :key="order.id" class="order-item">
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId }}</p>
-                <p>购买数量：{{ order.quantity }}</p>
-                <p>总价：￥{{ order.totalPrice }}</p>
-                <p>状态：{{ order.orderStatus }}</p>
-                <p>地址：{{ order.address }}</p>
+
+                <!-- 动态显示字段 -->
+                <template v-if="order.orderType === 'PURCHASE'">
+                  <p>购买数量：{{ order.quantity }}</p>
+                  <p>总价：￥{{ order.totalPrice }}</p>
+                </template>
+                <template v-else-if="order.orderType === 'RENTAL'">
+                  <p>租借数量：{{ order.quantity }}</p>
+                  <p>总价（含押金）：￥{{ order.totalPrice }}</p>
+                  <p>租借天数：{{ order.rentalDurationDays }} 天</p>
+                  <p>租借时期：{{ order.rentalStart || 'N/A' }} 至 {{ order.rentalEnd || 'N/A' }}</p>
+                </template>
+
+                <p>订单状态：{{ order.orderStatus }}</p>
+                <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
               </div>
             </div>
@@ -174,12 +185,21 @@
               <div v-for="order in sellerOrders" :key="order.id" class="order-item">
                 <h3>订单编号：{{ order.id }}</h3>
                 <p>商品编号：{{ order.productId || 'N/A' }}</p>
-                <p>订单类型：{{ order.orderType }}</p>
-                <p>购买数量：{{ order.quantity || 'N/A' }}</p>
-                <p>租赁时长：{{ order.rentalDurationDays || 'N/A' }} 天</p>
-                <p>总价：￥{{ order.totalPrice }}</p>
-                <p>状态：{{ order.orderStatus }}</p>
-                <p>地址：{{ order.address }}</p>
+
+                <!-- 动态显示字段 -->
+                <template v-if="order.orderType === 'PURCHASE'">
+                  <p>购买数量：{{ order.quantity }}</p>
+                  <p>总价：￥{{ order.totalPrice }}</p>
+                </template>
+                <template v-else-if="order.orderType === 'RENTAL'">
+                  <p>租借数量：{{ order.quantity }}</p>
+                  <p>总价（含押金）：￥{{ order.totalPrice }}</p>
+                  <p>租借天数：{{ order.rentalDurationDays }} 天</p>
+                  <p>租借时期：{{ order.rentalStart || 'N/A' }} 至 {{ order.rentalEnd || 'N/A' }}</p>
+                </template>
+
+                <p>订单状态：{{ order.orderStatus }}</p>
+                <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
               </div>
             </div>
@@ -610,6 +630,7 @@ export default {
             },
           });
           if (response.status === 200) {
+            console.log("消费订单数据：", response.data);
             this.consumerOrders = response.data;
           } else {
             alert("获取消费订单失败！");
@@ -708,6 +729,8 @@ export default {
     this.fetchUserInfo();
   }
 };
+
+
 </script>
   <style scoped>
   html,
