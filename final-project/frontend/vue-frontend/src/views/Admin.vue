@@ -47,7 +47,30 @@
 
 
       <!--管理商品-->
-
+      <div v-if="activeTab === 'Product'">
+        <div class="right-box">
+ 
+        <div class="comment-list">
+          <h2>管理商品</h2>
+          <div
+            class="product-item"
+            v-for="productData in productWithSellerData"
+            :key="productData.id"
+            @click="goToProductPage(productData.product.id)"
+          >
+            <div class="product-header">
+              <img :src="baseURL + productData.product.imagePath" alt="商品图片" class="product-image" />
+              <h4 class="product-username">{{ productData.product.name }}</h4>
+              <span class="product-rating">出售价格：¥{{ productData.product.price }}</span>
+              <span class="product-rating">出租价格：¥{{ productData.product.rentalPrice }}</span>
+              <span class="product-rating">商家：{{ productData.seller?.username || "加载中..." }}</span>
+              <span class="product-rating">信誉积分：{{ productData.seller?.reputationScore || "加载中..." }}</span>
+              <button class="delete-product-button" @click.stop="deleteProduct(productData.product.id)">下架</button>
+            </div>
+          </div>
+        </div>
+        </div> 
+      </div>
 
       <!--管理评论-->
       <div v-if="activeTab === 'Review'">
@@ -94,9 +117,9 @@ export default {
         username: "未登录用户",
         avatarUrl: "https://via.placeholder.com/50", // 默认头像
       },
-
+      baseURL:'http://localhost:8080',
       activeTab: "Admin", // 默认选中"个人中心"选项卡
-
+      productWithSellerData: [], // 商品及卖家信息
       Users: [], //用户列表
       reviews: [], //评论列表
     };
@@ -107,6 +130,9 @@ export default {
       if (tab === "User") {
         this.fetchUsers(); // 获取用户列表
       } 
+      if(tab === "Product"){
+        this.fetchProducts(); //获取商品列表
+      }
       if(tab === "Review"){
         this.fetchReviews(); //获取评论列表
       }
@@ -134,7 +160,15 @@ export default {
         alert("获取用户列表时出错，请稍后再试");
       }
     },
-
+    //获取商品列表
+    fetchProducts() {
+      axios
+        .get("/api/products/all-with-sellers")
+        .then(({ data }) => {
+          this.productWithSellerData = data;
+        })
+        .catch((error) => console.error("获取商品及卖家信息失败:", error));
+    },
     //调用接口获取评论列表
     fetchReviews() {
         axios
@@ -166,6 +200,25 @@ export default {
       console.error("删除评论失败:", error);
       alert("删除评论失败，请重试");
     }
+    },
+
+    //下架商品
+    async deleteProduct(productId) {
+      try {
+        console.log(productId);
+        const response = await axios.delete(`/api/products/delete/${productId}`);
+        if (response.status === 200) {
+          this.productWithSellerData = this.productWithSellerData.filter(
+            productData => productData.product.id !== productId
+          );
+          alert("商品已下架");
+        } else {
+          alert("删除商品失败1");
+        }
+      } catch (error) {
+        console.error("删除商品时出错", error);
+        alert("删除商品失败2");
+      }
     },
 
 
@@ -229,6 +282,14 @@ export default {
       alert("积分更新失败，请稍后重试");
     }
   },
+  // 跳转到商品详情页面
+  goToProductPage(productId) {
+      // 使用 Vue Router 进行跳转
+      this.$router.push({
+        name: "ProductDetail", // 路由名（在 router/index.js 中配置）
+        params: { id: productId }, 
+      });
+    },
   },
 
   //初始化方法
@@ -539,4 +600,65 @@ export default {
       color: darkred; /* 悬停时颜色变化 */
     }
    /*  评论界面   */
+
+   /* 商品界面 */
+    .product-item {
+      display: flex;
+      flex-direction: column; /* 垂直布局 */
+      background-color: #5929caab; /* 半透明背景色 */
+      border-radius: 8px; /* 圆角 */
+      border: 1px solid #ffffff; /* 边框颜色 */
+      padding: 15px; /* 内边距 */
+      margin-bottom: 15px; /* 项目间距 */
+      cursor: pointer; /* 鼠标变成手型 */
+      transition: background-color 0.3s ease; /* 背景色过渡效果 */
+    }
+
+    .product-item:hover {
+      background-color: #402280; /* 悬停时背景色 */
+    }
+
+    .product-header {
+      display: flex;
+      flex-wrap: wrap; /* 自动换行 */
+      gap: 10px; /* 项目之间的间距 */
+      align-items: center; /* 垂直居中 */
+    }
+
+    .product-image {
+      width: 80px; /* 图片宽度 */
+      height: 80px; /* 图片高度 */
+      object-fit: cover; /* 图片适应容器 */
+      border-radius: 8px; /* 圆角 */
+      margin-right: 15px; /* 图片和内容之间的间距 */
+    }
+
+    .product-username {
+      font-size: 18px; /* 用户名字体大小 */
+      font-weight: bold; /* 加粗 */
+      color: #ffffff; /* 文字颜色 */
+    }
+
+    .product-rating {
+      font-size: 16px; /* 评分字体大小 */
+      color: #ffdd57; /* 金色 */
+      margin-right: 10px; /* 多个评分之间的间距 */
+    }
+
+    .delete-product-button {
+      background-color: transparent; /* 背景透明 */
+      color: red; /* 删除按钮文字颜色 */
+      border: none; /* 无边框 */
+      padding: 5px 10px; /* 内边距 */
+      font-size: 14px; /* 字体大小 */
+      border-radius: 5px; /* 圆角 */
+      cursor: pointer; /* 鼠标变成手型 */
+      transition: background-color 0.3s ease; /* 背景色过渡 */
+    }
+
+    .delete-product-button:hover {
+      background-color: darkred; /* 悬停时背景色 */
+      color: #ffffff; /* 悬停时文字颜色 */
+    }
+
 </style>

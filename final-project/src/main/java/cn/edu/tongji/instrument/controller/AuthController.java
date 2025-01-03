@@ -1,6 +1,6 @@
 package cn.edu.tongji.instrument.controller;
 
-import cn.edu.tongji.instrument.service.SMSService;
+import cn.edu.tongji.instrument.service.AuthService;
 import cn.edu.tongji.instrument.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private SMSService smsService;
+    private AuthService authService;
 
     @Autowired
     private UserService userService;
@@ -24,7 +24,7 @@ public class AuthController {
      */
     @PostMapping("/send-otp")
     public ResponseEntity<String> sendOTP(@RequestParam String phoneNumber) {
-        String otp = smsService.sendSMS(phoneNumber);
+        String otp = authService.sendSMS(phoneNumber);
         return ResponseEntity.ok("验证码已发送到 " + phoneNumber);
     }
 
@@ -43,7 +43,7 @@ public class AuthController {
             @RequestParam String newPassword
     ) {
         // 验证验证码
-        boolean isValidOtp = smsService.verifyOTP(phoneNumber, otp);
+        boolean isValidOtp = authService.verifyOTP(phoneNumber, otp);
 
         if (!isValidOtp) {
             return ResponseEntity.badRequest().body("验证码错误或已过期");

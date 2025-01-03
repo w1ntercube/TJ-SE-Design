@@ -18,16 +18,17 @@
     <div class="product-container">
       <div
         class="product-card"
-        v-for="product in paginatedProducts"
-        :key="product.id"
-        @click="goToProductPage(product.id)"
+        v-for="productData in paginatedProducts"
+        :key="productData.id"
+        @click="goToProductPage(productData.product.id)"
       >
-        <img :src="baseURL+product.imagePath" alt="商品图片" class="product-image" />
-        <h3 class="product-name">{{ product.name }}</h3>
-        <p class="product-price">价格：¥{{ product.price }}</p>
+      <img :src="baseURL + productData.product.imagePath" alt="商品图片" class="product-image" />
+        <h3 class="product-name">{{ productData.product.name }}</h3>
+        <p class="product-price">出售价格：¥{{ productData.product.price }}</p>
+        <p class="product-price">出租价格：¥{{ productData.product.rentalPrice }}</p>
         <!-- 商家信息 -->
-        <p class="seller-info">商家：{{ product.seller.username }}</p>
-        <p class="seller-reputation">信誉积分：{{ product.seller.reputationScore }}</p>
+        <p class="seller-info">商家：{{ productData.seller?.username || "加载中..." }}</p>
+        <p class="seller-reputation">信誉积分：{{ productData.seller?.reputationScore || "加载中..." }}</p>
       </div>
     </div>
 
@@ -65,7 +66,7 @@ export default {
         avatarUrl: require('@/Resources/user.jpg'), // 默认头像
       },
       searchQuery: "",
-      products: [], // 商品列表（从接口获取）
+      productWithSellerData: [], // 商品及卖家信息
       currentPage: 1, // 当前页
       itemsPerPage: 5, // 每页商品数（4*2）
     };
@@ -77,9 +78,9 @@ export default {
         : require('@/Resources/user.jpg');
     },
     filteredProducts() {
-      if (!this.searchQuery) return this.products;
-      return this.products.filter((product) =>
-        product.name.includes(this.searchQuery)
+      if (!this.searchQuery) return this.productWithSellerData;
+      return this.productWithSellerData.filter((data) =>
+        data.product.name.includes(this.searchQuery)
       );
     },
     totalPages() {
@@ -94,17 +95,14 @@ export default {
   methods: {
 
     // 获取商品数据
-    fetchProducts() {
+    fetchProductsWithSellers() {
       axios
-        .get("/api/products/all") 
-        .then((response) => {
-          this.products = response.data; // 将返回的数据赋给 products
+        .get("/api/products/all-with-sellers")
+        .then(({ data }) => {
+          this.productWithSellerData = data;
         })
-        .catch((error) => {
-          console.error("获取商品列表失败:", error);
-        });
+        .catch((error) => console.error("获取商品及卖家信息失败:", error));
     },
-
 
         // 获取用户信息
         fetchUserInfo(username) {
@@ -143,14 +141,11 @@ export default {
     },
   },
   created() {
-    // 组件创建时加载商品列表
-    this.fetchProducts();
-      // 从 localStorage 获取用户信息
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (storedUser && storedUser.username) {
-    // 如果找到了用户名，调用 fetchUserInfo 并传递用户名
-    this.fetchUserInfo(storedUser.username);
-  }
+    this.fetchProductsWithSellers();
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser?.username) {
+      this.fetchUserInfo(storedUser.username);
+    }
   },
 };
 </script>

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Random;
 
 @Service
-public class SMSService {
+public class AuthService {
 
     private final Map<String, String> otpStorage = new HashMap<>();
 
