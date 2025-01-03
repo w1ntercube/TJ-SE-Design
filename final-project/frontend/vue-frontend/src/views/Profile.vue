@@ -158,6 +158,24 @@
                 <p>订单状态：{{ getOrderStatusText(order.orderStatus) }}</p>
                 <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
+
+                <button
+                  v-if="order.orderStatus === 'SHIPPED'"
+                  @click="confirmDelivery(order)"
+                  class="order-action-button"
+                >
+                  确认收货
+                </button>
+
+                <button
+                  v-if="order.orderStatus === 'DELIVERED'&& order.orderType === 'RENTAL'"
+                  @click="returnOrder(order)"
+                  class="action-button"
+                >
+                  我要退还
+                </button>
+
+
               </div>
             </div>
             <div v-else>
@@ -224,6 +242,23 @@
                 <p>订单状态：{{getOrderStatusText(order.orderStatus)}}</p>
                 <p>订单地址：{{ order.address }}</p>
                 <p>创建时间：{{ order.createdAt }}</p>
+
+                <button
+                  v-if="order.orderStatus === 'PAID'"
+                  @click="shipOrder(order)"
+                  class="order-action-button"
+                >
+                  发货
+                </button>
+
+                <button
+                  v-if="order.orderStatus === 'RETURNED'&& order.orderType === 'RENTAL'"
+                  @click="confirmReturn(order)"
+                  class="action-button"
+                >
+                  商家确认
+                </button>
+
               </div>
             </div>
             <div v-else>
@@ -655,6 +690,15 @@ export default {
           if (response.status === 200) {
             console.log("消费订单数据：", response.data);
             this.consumerOrders = response.data;
+            // 提取订单ID，按降序排列并取前10个
+            const recentOrderIds = this.consumerOrders
+              .map(order => order.id)
+              .sort((a, b) => b - a) // 按订单号降序排序
+              .slice(0, 10); // 取前10个订单号
+
+            // 检查每个订单状态并更新
+            await Promise.all(recentOrderIds.map(orderId => this.updateOrderStatus(orderId)));
+
           } else {
             alert("获取消费订单失败！");
           }
@@ -699,6 +743,16 @@ export default {
 
         const response = await axios.get("/api/orders/seller/filter", { params });
         this.sellerOrders = response.data;
+
+        // 提取订单ID，按降序排列并取前10个
+        const recentOrderIds = this.sellerOrders
+          .map(order => order.id)
+          .sort((a, b) => b - a) // 按订单号降序排序
+          .slice(0, 10); // 取前10个订单号
+
+        // 检查每个订单状态并更新
+        await Promise.all(recentOrderIds.map(orderId => this.updateOrderStatus(orderId)));
+
       } catch (error) {
         console.error("获取店铺订单失败", error);
         alert("获取店铺订单失败，请稍后再试");
@@ -719,7 +773,86 @@ export default {
       return statusMap[status] || "未知状态";
     },
 
+    async confirmDelivery(order) {
+      try {
+        const response = await axios.patch(`/api/orders/${order.id}/confirm-delivery`);
+        if (response.status === 200) {
+          alert("确认收货成功！");
+          // 更新订单状态为 DELIVERED
+          order.orderStatus = "DELIVERED";
+        } else {
+          alert("确认收货失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("确认收货时出错：", error);
+        alert("确认收货失败，请稍后再试！");
+      }
+    },
 
+    async returnOrder(order) {
+      try {
+        const response = await axios.patch(`/api/orders/${order.id}/return`);
+        if (response.status === 200) {
+          alert("退还订单成功！");
+          order.orderStatus = "RETURNED";
+        } else {
+          alert("退还订单失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("退还订单时出错：", error);
+        alert("退还订单失败，请稍后再试！");
+      }
+    },
+
+    // 发货逻辑
+    async shipOrder(order) {
+      try {
+        const response = await axios.patch(`/api/orders/seller/${order.id}/ship`);
+        if (response.status === 200) {
+          alert("发货成功！");
+          order.orderStatus = "SHIPPED";
+        } else {
+          alert("发货失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("发货时出错：", error);
+        alert("发货失败，请稍后再试！");
+      }
+    },
+
+    // 商家确认逻辑
+    async confirmReturn(order) {
+      try {
+        const response = await axios.patch(`/api/orders/seller/${order.id}/merchant-confirm`);
+        if (response.status === 200) {
+          alert("确认成功！");
+          order.orderStatus = "MERCHANT_CONFIRMED";
+        } else {
+          alert("确认失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error("确认时出错：", error);
+        alert("确认失败，请稍后再试！");
+      }
+    },
+
+    async updateOrderStatus(orderId) {
+      try {
+        const response = await axios.get("/api/orders/queryStatus", {
+          params: {
+            orderId: orderId,
+          },
+        });
+
+        if (response.data.status === "success") {
+          console.log(`订单 ${orderId} 状态更新成功: ${response.data.message}`);
+        } else {
+          console.warn(`订单 ${orderId} 状态更新失败: ${response.data.message}`);
+        }
+      } catch (error) {
+        console.error(`更新订单 ${orderId} 状态时出错:`, error);
+      }
+    },
 
 
   //发送消息给AI
@@ -1166,7 +1299,22 @@ button:hover {
     margin-right: 0px;
   }
 
-    
+  .order-action-button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #6a2af5;
+    color: white;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .order-action-button:hover {
+    background-color: #4c13fa;
+  }
+
   /* ai界面 */
 .ai-chat-container {
   display: flex;

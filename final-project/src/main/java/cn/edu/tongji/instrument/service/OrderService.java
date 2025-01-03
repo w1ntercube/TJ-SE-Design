@@ -135,4 +135,30 @@ public class OrderService {
 
         return map;
     }
+
+    public Order confirmOrderDelivery(Long orderId) {
+        Order order = getOrderById(orderId);
+
+        // 检查当前订单状态是否为 SHIPPED
+        if (!OrderStatus.SHIPPED.equals(order.getOrderStatus())) {
+            throw new IllegalStateException("订单状态必须为 'SHIPPED' 才能确认收货");
+        }
+
+        // 更新订单状态为 DELIVERED
+        order.setOrderStatus(OrderStatus.DELIVERED);
+        return orderRepository.save(order);
+    }
+
+    // 退还订单逻辑
+    public Order returnOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+
+        if (!order.getOrderStatus().equals(OrderStatus.DELIVERED)) {
+            throw new IllegalStateException("Only DELIVERED orders can be returned.");
+        }
+
+        order.setOrderStatus(OrderStatus.RETURNED);
+        return orderRepository.save(order);
+    }
 }

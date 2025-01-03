@@ -34,11 +34,6 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
-    // 更新订单状态
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
-        return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
-    }
 
     /**
      * 根据用户ID、订单类型和订单状态筛选订单
@@ -58,4 +53,19 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    // 买家确认收货
+    @CrossOrigin(origins = "http://localhost:8081")
+    @PatchMapping("/{id}/confirm-delivery")
+    public ResponseEntity<Order> confirmOrderReceipt(@PathVariable Long id) {
+        Order updatedOrder = orderService.confirmOrderDelivery(id);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    // 买家申请还货
+    @PatchMapping("/{id}/return")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity<Order> returnOrder(@PathVariable Long id) {
+        Order updatedOrder = orderService.returnOrder(id);
+        return ResponseEntity.ok(updatedOrder);
+    }
 }
