@@ -5,6 +5,7 @@ import cn.edu.tongji.instrument.service.SellerOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import cn.edu.tongji.instrument.entity.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,5 +37,25 @@ public class SellerOrderController {
     ) {
         List<Map<String, Object>> orders = sellerOrderService.getSellerOrders(sellerId, orderType, orderStatus);
         return ResponseEntity.ok(orders);
+    }
+
+    /**
+     * 商家发货
+     */
+    @PatchMapping("/{id}/ship")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity<Order> shipOrder(@PathVariable Long id) {
+        Order updatedOrder = sellerOrderService.shipOrder(id);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    /**
+     * 商家确认退货
+     */
+    @PatchMapping("/{id}/merchant-confirm")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity<Order> confirmMerchantReturn(@PathVariable Long id) {
+        Order updatedOrder = sellerOrderService.confirmMerchantReturn(id);
+        return ResponseEntity.ok(updatedOrder);
     }
 }

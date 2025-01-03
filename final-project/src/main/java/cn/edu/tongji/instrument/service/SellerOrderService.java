@@ -2,6 +2,7 @@ package cn.edu.tongji.instrument.service;
 
 import cn.edu.tongji.instrument.entity.*;
 import cn.edu.tongji.instrument.entity.enums.OrderStatus;
+import cn.edu.tongji.instrument.repository.OrderRepository;
 import cn.edu.tongji.instrument.repository.ProductRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
@@ -14,15 +15,18 @@ import java.util.stream.Collectors;
 public class SellerOrderService {
 
     private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
 
     public SellerOrderService(
             ProductRepository productRepository,
+            OrderRepository orderRepository,
             PurchaseOrderRepository purchaseOrderRepository,
             RentalOrderRepository rentalOrderRepository
     ) {
         this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.rentalOrderRepository = rentalOrderRepository;
     }
@@ -115,5 +119,32 @@ public class SellerOrderService {
         }
 
         return map;
+    }
+
+
+    // 发货
+    public Order shipOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+
+        if (!order.getOrderStatus().equals(OrderStatus.PAID)) {
+            throw new IllegalStateException("Only PAID orders can be shipped.");
+        }
+
+        order.setOrderStatus(OrderStatus.SHIPPED);
+        return orderRepository.save(order);
+    }
+
+    // 商家确认
+    public Order confirmMerchantReturn(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+
+        if (!order.getOrderStatus().equals(OrderStatus.RETURNED)) {
+            throw new IllegalStateException("Only RETURNED orders can be confirmed by the merchant.");
+        }
+
+        order.setOrderStatus(OrderStatus.MERCHANT_CONFIRMED);
+        return orderRepository.save(order);
     }
 }
