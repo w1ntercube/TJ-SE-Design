@@ -1,6 +1,6 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2" pages="2">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17" pages="2">
   <diagram name="功能建模" id="NBFd98P7RPhy97YwyTXO">
-    <mxGraphModel dx="1276" dy="614" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1118" dy="702" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -49,10 +49,7 @@
         <mxCell id="d9HQBDMvV-NOfpfXo6M2-12" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
           <mxGeometry x="145" y="350" width="117.13" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="d9HQBDMvV-NOfpfXo6M2-27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="SNAdd0FfvzcMFL1DqeOO-3" source="d9HQBDMvV-NOfpfXo6M2-14" target="d9HQBDMvV-NOfpfXo6M2-26" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="d9HQBDMvV-NOfpfXo6M2-14" value="查看用户信用积分历史" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
+        <mxCell id="d9HQBDMvV-NOfpfXo6M2-14" value="调整用户信用积分" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
           <mxGeometry y="430" width="127.13" height="60" as="geometry" />
         </mxCell>
         <mxCell id="d9HQBDMvV-NOfpfXo6M2-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-3" source="d9HQBDMvV-NOfpfXo6M2-15" target="d9HQBDMvV-NOfpfXo6M2-21" edge="1">
@@ -83,13 +80,11 @@
         <mxCell id="SNAdd0FfvzcMFL1DqeOO-37" value="" style="shape=mxgraph.bpmn.shape;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;perimeter=ellipsePerimeter;outline=end;symbol=terminate;rounded=0;shadow=0;comic=0;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
           <mxGeometry x="83.5" y="820" width="40" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="d9HQBDMvV-NOfpfXo6M2-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="SNAdd0FfvzcMFL1DqeOO-3" target="d9HQBDMvV-NOfpfXo6M2-26" edge="1">
+        <mxCell id="6zBP4_EuAtDIC9WrYVrO-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="SNAdd0FfvzcMFL1DqeOO-3" source="d9HQBDMvV-NOfpfXo6M2-14" target="d9HQBDMvV-NOfpfXo6M2-21">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="64" y="490" as="sourcePoint" />
+            <mxPoint x="83.5" y="610" as="sourcePoint" />
+            <mxPoint x="353.5" y="704" as="targetPoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="d9HQBDMvV-NOfpfXo6M2-26" value="" style="shape=mxgraph.bpmn.shape;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;perimeter=ellipsePerimeter;outline=end;symbol=terminate;rounded=0;shadow=0;comic=0;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="SNAdd0FfvzcMFL1DqeOO-3" vertex="1">
-          <mxGeometry x="43.57" y="560" width="40" height="40" as="geometry" />
         </mxCell>
         <mxCell id="SNAdd0FfvzcMFL1DqeOO-121" value="系统展示用户列表，包括用户名、信用积分、状态（正常/封禁）" style="whiteSpace=wrap;html=1;fontFamily=Verdana;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;arcSize=50;" parent="1" vertex="1">
           <mxGeometry x="473.86" y="172.5" width="130.01" height="65" as="geometry" />
