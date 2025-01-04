@@ -79,41 +79,66 @@
       alert("请填写用户名和密码！");
       return;
     }
-    if(this.username == 'admin' && this.password == 'admin') {
-      this.$router.push('/Admin');
-      return;
-    }
     try {
-      // 使用 Axios 发起 POST 请求到后端登录接口
-      const response = await axios.post("/api/users/login", {
+      // 尝试管理员登录
+      const adminResponse = await axios.post("/api/admin/login", {
         username: this.username,
         password: this.password,
       });
 
-      // 登录成功逻辑
-      const userData = response.data; // 假设返回的数据中有 `id`、`username` 等用户信息
+      const userResponse = await axios.post("/api/users/login", {
+        username: this.username,
+        password: this.password,
+      });
 
-      // 将用户信息存储到 localStorage
+      const adminData = adminResponse.data; 
+      const userData = userResponse.data; 
+
+         
       localStorage.setItem("user", JSON.stringify(userData));
-      
-      // 登录成功逻辑
-      alert(`欢迎回来，${response.data.username}！`);
 
-      // 跳转到主页或其他页面
-      this.$router.push("/home");
-    } catch (error) {
-      // 登录失败逻辑
-      if (error.response && error.response.status === 403) 
-      {
-        this.errorMessage = '账户已被封禁';
-      }
+      // 登录成功提示
+      alert(`欢迎回来，管理员 ${adminData.username}！`);
 
-      if (error.response && error.response.status === 401) {
-        alert("用户名或密码错误！");
+      // 跳转到管理员主页
+      this.$router.push("/Admin");
+    } catch (adminError) {
+      // 如果管理员登录失败，检查是否是普通用户
+      if (adminError.response && adminError.response.status === 401) {
+        try {
+          // 尝试普通用户登录
+          const userResponse = await axios.post("/api/users/login", {
+            username: this.username,
+            password: this.password,
+          });
+
+          // 如果成功，处理普通用户登录逻辑
+          const userData = userResponse.data; // 假设返回的数据中有 `id`、`username` 等用户信息
+
+          // 将用户信息存储到 localStorage
+          localStorage.setItem("user", JSON.stringify(userData));
+
+          // 登录成功提示
+          alert(`欢迎回来，${userData.username}！`);
+
+          // 跳转到普通用户主页
+          this.$router.push("/home");
+        } catch (userError) {
+          // 如果用户登录失败，处理错误逻辑
+          if (userError.response && userError.response.status === 403) {
+            this.errorMessage = "账户已被封禁";
+          } else if (userError.response && userError.response.status === 401) {
+            alert("用户名或密码错误！");
+          } else {
+            alert("登录失败，请稍后重试！");
+          }
+        }
       } else {
-        alert("登录失败，请稍后再试！");
+        // 如果管理员的其他错误（非 401），处理错误逻辑
+        alert("登录失败，请稍后重试！");
       }
     }
+
   },
       forgotPassword() {
         this.$router.push('/password/recover');
