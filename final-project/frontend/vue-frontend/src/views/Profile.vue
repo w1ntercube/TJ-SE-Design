@@ -320,7 +320,7 @@
 
              <!--               询问AI             -->       
              <div v-if="activeTab === 'goAi'" class="ai-chat-container">
-            <h2>乐器大师</h2>
+            <h2>乐器大师强尼</h2>
            <div class="ai-chat-box">
            <div
                class="ai-chat-message"
