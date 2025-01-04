@@ -22,6 +22,8 @@ public class ReviewController {
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ReviewDTO>> getReviewsByProductId(@PathVariable Long productId) {
         List<ReviewDTO> reviews = reviewService.getReviewsByProductId(productId);
+        System.out.println("ReviewController类的getReviewsByProductId方法调用了reviewService类的getReviewsByProductId方法。");
+
         if (reviews.isEmpty()) {
             return ResponseEntity.notFound().build(); // 如果列表为空，返回 404
         }
@@ -36,6 +38,7 @@ public class ReviewController {
 
         // 调用服务层保存评论
         ReviewDTO savedReview = reviewService.addReview(reviewDTO);
+        System.out.println("ReviewController类的addReview方法调用了reviewService类的addReview方法。");
 
         // 返回保存成功的评论数据
         return ResponseEntity.ok(savedReview);
@@ -53,12 +56,15 @@ public class ReviewController {
 
         // 查找评论
         Optional<Review> reviewOptional = reviewService.findByReviewIdAndUserId(reviewId, userId);
+        System.out.println("ReviewController类的deleteReview方法调用了reviewService类的findByReviewIdAndUserId方法。");
+
         if (reviewOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review not found or not owned by user");
         }
 
         // 删除评论
         reviewService.delete(reviewId);
+        System.out.println("ReviewController类的deleteReview方法调用了reviewService类的delete方法。");
 
         // 返回删除成功消息
         return ResponseEntity.ok("Review deleted successfully");
@@ -68,6 +74,8 @@ public class ReviewController {
     @GetMapping("/all")
     public ResponseEntity<List<ReviewDTO>> getAllReviews() {
         List<ReviewDTO> allReviews = reviewService.getAllReviews();
+        System.out.println("ReviewController类的getAllReviews方法调用了reviewService类的getAllReviews方法。");
+
         if (allReviews.isEmpty()) {
             return ResponseEntity.noContent().build(); // 如果没有评论，返回 204 No Content
         }
@@ -79,6 +87,8 @@ public class ReviewController {
     public ResponseEntity<String> deleteReviewById(@PathVariable Long reviewId) {
         // 删除评论
         reviewService.delete(reviewId);
+        System.out.println("ReviewController类的deleteReviewById方法调用了reviewService类的delete方法。");
+
         // 返回删除成功消息
         return ResponseEntity.ok("Review deleted successfully");
     }

@@ -49,6 +49,7 @@ public class ProductController {
     public ResponseEntity<User> getUserByProductId(@PathVariable Long id) {
         // 查询商品
         Optional<Product> productOptional = productService.getProductById(id);
+        System.out.println("ProductController类里的getUserByProductId方法调用了productService类里的getProductById方法。");
 
         // 如果商品不存在，返回 404
         if (productOptional.isEmpty()) {
@@ -60,6 +61,7 @@ public class ProductController {
 
         // 通过商品的 sellerId 获取卖家信息
         User seller = userService.getUserById(product.getSellerId());
+        System.out.println("ProductController类里的getUserByProductId方法调用了userService类里的getUserById方法。");
 
         // 如果卖家信息不存在，返回 404
         if (seller == null) {
@@ -75,6 +77,8 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable Long id) {
         Optional<Product> productOptional = productService.getProductById(id);
+        System.out.println("ProductController类里的getProduct方法调用了productService类里的getProductById方法。");
+
         if (productOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -86,6 +90,8 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         // 查找商品
         Optional<Product> productOptional = productService.getProductById(id);
+        System.out.println("ProductController类里的deleteProduct方法调用了productService类里的getProductById方法。");
+
         if (productOptional.isEmpty()) {
             return ResponseEntity.status(404).body("Product not found");
         }
@@ -94,6 +100,7 @@ public class ProductController {
 
         product.setIsActive(false); // 增加库存
         productService.updateProduct(product);
+        System.out.println("ProductController类里的deleteProduct方法调用了productService类里的updateProduct方法。");
 
         return ResponseEntity.ok("Product deleted successfully");
     }
@@ -136,6 +143,8 @@ public class ProductController {
 
         try {
             ProductDTO savedProduct = productService.addProduct(productDTO, file);
+            System.out.println("ProductController类里的uploadProductWithImage方法调用了productService类里的addProduct方法。");
+
             return ResponseEntity.ok(savedProduct);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
@@ -157,12 +166,16 @@ public class ProductController {
 
         // 查找卖家
         User seller = userService.findByUsername(sellerName);
+        System.out.println("ProductController类里的getProductsBySellerName方法调用了userService类里的findByUsername方法。");
+
         if (seller == null) {
             return ResponseEntity.status(404).body(null);  // 如果找不到卖家，返回404
         }
 
         // 查找该卖家的所有商品
         List<Product> products = productService.getProductsBySeller(seller.getId());
+        System.out.println("ProductController类里的getProductsBySellerName方法调用了productService类里的getProductsBySeller方法。");
+
         List<Product> activeProducts = new ArrayList<>(); // 初始化 activeProducts
         for (Product product : products) {
             if (product.getIsActive()) {
@@ -178,6 +191,8 @@ public class ProductController {
         Integer quantity = ((Number) request.get("quantity")).intValue();
 
         Optional<Product> productOptional = productService.getProductById(productId);
+        System.out.println("ProductController类里的adjustSellStock方法调用了productService类里的getProductById方法。");
+
         if (productOptional.isEmpty()) {
             return ResponseEntity.status(404).body("Product not found");
         }
@@ -191,6 +206,7 @@ public class ProductController {
 
         product.setStock(product.getStock() + quantity); // 增加库存
         productService.updateProduct(product);
+        System.out.println("ProductController类里的adjustSellStock方法调用了productService类里的updateProduct方法。");
 
         return ResponseEntity.ok("Stock updated successfully");
     }
@@ -201,6 +217,8 @@ public class ProductController {
         Integer quantity = ((Number) request.get("quantity")).intValue();
 
         Optional<Product> productOptional = productService.getProductById(productId);
+        System.out.println("ProductController类里的adjustRentStock方法调用了productService类里的getProductById方法。");
+
         if (productOptional.isEmpty()) {
             return ResponseEntity.status(404).body("Product not found");
         }
@@ -215,6 +233,8 @@ public class ProductController {
         // 调整库存
         product.setRentalStock(currentStock + quantity);
         productService.updateProduct(product);
+        System.out.println("ProductController类里的adjustRentStock方法调用了productService类里的updateProduct方法。");
+
 
         return ResponseEntity.ok("Stock updated successfully");
     }
@@ -228,6 +248,8 @@ public class ProductController {
         Map<String, Object> response = new HashMap<>();
         try {
             boolean isAvailable = productService.checkStock(productId, quantity, type);
+            System.out.println("ProductController类里的checkStock方法调用了productService类里的checkStock方法。");
+
             response.put("isAvailable", isAvailable);
             response.put("message", isAvailable ? "库存充足" : "库存不足");
             return ResponseEntity.ok(response);

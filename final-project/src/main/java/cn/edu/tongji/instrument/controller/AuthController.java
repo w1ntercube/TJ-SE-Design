@@ -45,12 +45,16 @@ public class AuthController {
         // 验证验证码
         boolean isValidOtp = authService.verifyOTP(phoneNumber, otp);
 
+        System.out.println("AuthController类的resetPassword方法调用了AuthService类的verifyOTP方法。");
+
         if (!isValidOtp) {
             return ResponseEntity.badRequest().body("验证码错误或已过期");
         }
 
         // 更新用户密码
         userService.updatePassword(phoneNumber, newPassword);
+
+        System.out.println("AuthController类的resetPassword方法调用了UserService类的updatePassword方法。");
 
         return ResponseEntity.ok("密码已重置成功");
     }

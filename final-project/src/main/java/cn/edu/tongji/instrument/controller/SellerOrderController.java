@@ -36,6 +36,7 @@ public class SellerOrderController {
             @RequestParam(required = false) OrderStatus orderStatus
     ) {
         List<Map<String, Object>> orders = sellerOrderService.getSellerOrders(sellerId, orderType, orderStatus);
+        System.out.println("sellerOrderController类里的getSellerOrders方法调用了sellerOrderService的getSellerOrders方法");
         return ResponseEntity.ok(orders);
     }
 
@@ -46,6 +47,7 @@ public class SellerOrderController {
     @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity<Order> shipOrder(@PathVariable Long id) {
         Order updatedOrder = sellerOrderService.shipOrder(id);
+        System.out.println("sellerOrderController类里的shipOrder方法调用了sellerOrderService的shipOrder方法");
         return ResponseEntity.ok(updatedOrder);
     }
 
@@ -56,6 +58,8 @@ public class SellerOrderController {
     @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity<Order> confirmMerchantReturn(@PathVariable Long id) {
         Order updatedOrder = sellerOrderService.confirmMerchantReturn(id);
+        System.out.println("sellerOrderController类里的confirmMerchantReturn方法调用了sellerOrderService的confirmMerchantReturn方法");
+
         return ResponseEntity.ok(updatedOrder);
     }
 }

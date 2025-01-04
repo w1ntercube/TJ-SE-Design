@@ -39,11 +39,16 @@ public class CartsController {
     @GetMapping("/find/{userId}")
     public ResponseEntity<List<ProductDTO>> getFavoritesByUserId(@PathVariable("userId") Long userId) {
         User user = userService.getUserById(userId);
+
+        System.out.println("AuthController类的resetPassword方法调用了AuthService类的verifyOTP方法。");
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         List<ProductDTO> favoriteProducts = new ArrayList<>(cartsService.getFavoriteProductsByUser(user));
+
+        System.out.println("AuthController类的resetPassword方法调用了cartsService类的getFavoriteProductsByUser方法。");
 
         List<ProductDTO> activeProducts = new ArrayList<>(); // 初始化 activeProducts
         for(ProductDTO productDTO : favoriteProducts) {
@@ -61,23 +66,41 @@ public class CartsController {
 
         boolean isExist = cartsService.isCartsExist(userId, productId);
 
+        System.out.println("AuthController类的toggleFavorite方法调用了cartsService类的isCartsExist方法。");
+
         if (isExist) {
 
             User user = userService.getUserById(userId);
+
+            System.out.println("AuthController类的toggleFavorite方法调用了userService类的getUserById方法。");
+
             Optional<Product> optionalProduct = productService.getProductById(productId);
+
+            System.out.println("AuthController类的toggleFavorite方法调用了productService类的getProductById方法。");
+
             Product product = optionalProduct.get();
 
 
             cartsService.removeFromCart(user, product);
 
+            System.out.println("AuthController类的toggleFavorite方法调用了cartsService类的removeFromCart方法。");
+
             return ResponseEntity.ok(false);
         } else {
             User user = userService.getUserById(userId);
+
+            System.out.println("AuthController类的toggleFavorite方法调用了userService类的getUserById方法。");
+
             Optional<Product> optionalProduct = productService.getProductById(productId);
+
+            System.out.println("AuthController类的toggleFavorite方法调用了productService类的getProductById方法。");
+
             Product product = optionalProduct.get();
             // 如果商品不存在，则添加
 
             cartsService.addToCart(user, product);
+
+            System.out.println("AuthController类的toggleFavorite方法调用了cartsService类的addToCart方法。");
 
             return ResponseEntity.ok(true);
 
@@ -90,6 +113,8 @@ public class CartsController {
             @PathVariable("productId") Long productId) {
 
         boolean exists = cartsService.isCartsExist(userId, productId);
+        System.out.println("AuthController类的exists方法调用了cartsService类的isCartsExist方法。");
+
         return ResponseEntity.ok(exists);
     }
 

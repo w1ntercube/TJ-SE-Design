@@ -21,6 +21,9 @@ public class AdminController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         // 通过用户名查找管理员
         Admin admin = adminService.findByUsername(loginRequest.getUsername());
+
+        System.out.println("AdminController类的login方法调用了adminService类的findByUsername方法。");
+
         if (admin == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("管理员不存在");
         }
@@ -38,6 +41,8 @@ public class AdminController {
     public ResponseEntity<Boolean> checkAdminExists(@PathVariable Long id) {
         // 调用服务层方法检查管理员是否存在
         boolean exists = adminService.adminExistsById(id);
+
+        System.out.println("AdminController类的checkAdminExists方法调用了adminService类的adminExistsById方法。");
 
         // 返回结果
         if (exists) {

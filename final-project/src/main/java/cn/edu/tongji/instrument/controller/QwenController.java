@@ -13,6 +13,7 @@ public class QwenController {
 
     @PostMapping
     public String chat(@RequestParam String message) {
+        System.out.println("QwenController类里的chat方法调用了qwenService里的sendMessage方法。");
         return qwenService.sendMessage(message);
     }
 }

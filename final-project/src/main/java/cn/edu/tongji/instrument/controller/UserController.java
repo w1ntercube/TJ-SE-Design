@@ -26,7 +26,10 @@ public class UserController {
     // 注册接口
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
+        System.out.println("sellerOrderController类里的confirmMerchantReturn方法调用了sellerOrderService的confirmMerchantReturn方法");
         User createdUser = userService.createUser(user);
+        System.out.println("UserController类里的createUser方法调用了userService的createUser方法");
+
         return ResponseEntity.ok(createdUser);
     }
 
@@ -34,6 +37,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         User user = userService.findByUsername(loginRequest.getUsername());
+        System.out.println("UserController类里的login方法调用了userService的findByUsername方法");
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户不存在");
         }
@@ -75,6 +80,8 @@ public class UserController {
 
         // 1. 验证用户名是否存在
         User user = userService.findByUsername(changePasswordRequest.getUsername());
+        System.out.println("UserController类里的changePassword方法调用了userService的findByUsername方法");
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户名不存在");
         }
@@ -85,6 +92,7 @@ public class UserController {
         // 3. 更新密码
         user.setPassword(changePasswordRequest.getNewPassword());
         userService.updateUser(user.getId(), user); // 假设 updateUser 方法支持修改密码
+        System.out.println("UserController类里的changePassword方法调用了userService的updateUser方法");
 
         /*        try {
             userService.changePassword(
@@ -103,13 +111,17 @@ public class UserController {
 
     // 查询所有用户
     @GetMapping("/allusers")
-    public List<User> getAllUsers(){return userService.getAllUsers();};
+    public List<User> getAllUsers(){
+        System.out.println("UserController类里的getAllUsers方法调用了userService的getAllUsers方法");
+        return userService.getAllUsers();};
 
 
     // 根据 ID 查询用户
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
+        System.out.println("UserController类里的getUserById方法调用了userService的getUserById方法");
+
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
@@ -117,6 +129,8 @@ public class UserController {
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         User user = userService.findByUsername(username);
+        System.out.println("UserController类里的getUserByUsername方法调用了userService的findByUsername方法");
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);  // 如果没有找到用户，返回 404
         }
@@ -128,6 +142,8 @@ public class UserController {
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
             User updatedUser = userService.updateUser(id, user);
+            System.out.println("UserController类里的updateUser方法调用了userService的updateUser方法");
+
             return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -138,6 +154,8 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        System.out.println("UserController类里的deleteUser方法调用了userService的deleteUser方法");
+
         return ResponseEntity.noContent().build();
     }
 
@@ -151,6 +169,8 @@ public class UserController {
         try {
             // 获取用户信息，通过用户名查找用户
             User user = userService.findByUsername(username);
+            System.out.println("UserController类里的uploadAvatar方法调用了userService的findByUsername方法");
+
             if (user == null) {
                 return ResponseEntity.status(400).body("User not found");
             }
@@ -170,6 +190,8 @@ public class UserController {
             // 更新用户的头像路径
             user.setAvatarUrl(avatarPath);
             userService.updateUser(user.getId(), user);  // 假设这里有个更新用户信息的服务方法
+            System.out.println("UserController类里的uploadAvatar方法调用了userService的updateUser方法");
+
             return ResponseEntity.ok("Avatar uploaded successfully");
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Error uploading image: " + e.getMessage());
@@ -180,6 +202,8 @@ public class UserController {
     @PostMapping("/{id}/ban")
     public ResponseEntity<User> banUser(@PathVariable Long id) {
         System.out.println("收到封禁请求，用户ID：" + id);
+        System.out.println("UserController类里的banUser方法调用了userService的banUser方法");
+
         return ResponseEntity.ok(userService.banUser(id));
     }
 
@@ -193,6 +217,8 @@ public class UserController {
     @PostMapping("/{id}/{delta}/reputation")
     public ResponseEntity<User> updateReputationScore(@PathVariable Long id, @PathVariable Integer delta) {
         User updatedUser = userService.updateReputationScore(id, delta);
+        System.out.println("UserController类里的updateReputationScore方法调用了userService的updateReputationScore方法");
+
         return ResponseEntity.ok(updatedUser);
     }
 }

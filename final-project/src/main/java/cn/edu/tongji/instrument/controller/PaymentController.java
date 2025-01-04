@@ -55,9 +55,11 @@ public class PaymentController {
 
         // 调用 Service 层创建购买订单
         Long orderId = paymentService.createPurchaseOrder(userId, productId, quantity, price,address);
+        System.out.println("PaymentController类里的createPurchaseOrder方法调用了PaymentService类里的createPurchaseOrder方法。");
 
         // 构建支付页面 URL
         String redirectUrl = paymentService.buildPaymentUrl(orderId, type, price, "PURCHASE");
+        System.out.println("PaymentController类里的createPurchaseOrder方法调用了PaymentService类里的buildPaymentUrl方法。");
 
         System.out.println(redirectUrl);
 
@@ -88,9 +90,11 @@ public class PaymentController {
         Long orderId = paymentService.createRentalOrder(
                 userId, productId, days, deposit, price, quantity, address
         );
+        System.out.println("PaymentController类里的createRentalOrder方法调用了PaymentService类里的createRentalOrder方法。");
 
         // 构建支付页面 URL
         String redirectUrl = paymentService.buildPaymentUrl(orderId, type, price, "RENTAL");
+        System.out.println("PaymentController类里的createRentalOrder方法调用了PaymentService类里的buildPaymentUrl方法。");
 
         System.out.println(redirectUrl);
 
@@ -122,6 +126,7 @@ public class PaymentController {
 
             // 调用 Service 校验签名并更新订单状态
             boolean result = paymentService.handlePaymentCallback(payId, param, type, price, reallyPrice, sign);
+            System.out.println("PaymentController类里的callback方法调用了PaymentService类里的handlePaymentCallback方法。");
 
             // 返回处理结果
             if (result) {
@@ -142,6 +147,7 @@ public class PaymentController {
     @GetMapping("/queryStatus")
     public ResponseEntity<Map<String, String>> queryOrderStatus(@RequestParam("orderId") String orderId) {
         boolean result = paymentService.queryAndUpdateOrderStatus(orderId);
+        System.out.println("PaymentController类里的queryOrderStatus方法调用了PaymentService类里的queryAndUpdateOrderStatus方法。");
 
         Map<String, String> response = new HashMap<>();
         if (result) {
@@ -162,12 +168,14 @@ public class PaymentController {
     ) {
         RentalOrder rentalOrder = rentalOrderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "订单未找到"));
+        System.out.println("PaymentController类里的updateRentalDates方法调用了RentalOrderRepository类里的findById方法。");
 
         // 更新字段
         rentalOrder.setRentalStart(LocalDate.parse(rentalStart));
         rentalOrder.setRentalEnd(LocalDate.parse(rentalEnd));
 
         rentalOrderRepository.save(rentalOrder);
+        System.out.println("PaymentController类里的updateRentalDates方法调用了RentalOrderRepository类里的save方法。");
 
         return ResponseEntity.ok("租借时间已更新");
     }
