@@ -8,6 +8,7 @@ import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,5 +161,52 @@ public class OrderService {
 
         order.setOrderStatus(OrderStatus.RETURNED);
         return orderRepository.save(order);
+    }
+
+    @Transactional // 保证事务性，确保库存和订单状态同时更新
+    public void updateOrderStatusToPaid(Long orderId, String orderType) {
+        if ("PURCHASE".equalsIgnoreCase(orderType)) {
+            // 获取购买订单信息
+            PurchaseOrder order = purchaseOrderRepository.findById(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+
+            // 确保订单当前状态为 PENDING
+            if (!OrderStatus.PENDING.equals(order.getOrderStatus())) {
+                throw new IllegalStateException("只有待支付订单才能更新为已支付");
+            }
+
+            // 更新订单状态为 PAID
+            order.setOrderStatus(OrderStatus.PAID);
+            purchaseOrderRepository.save(order);
+
+            // 更新库存
+            int affectedRows = productRepository.decrementStock(order.getProductId(), order.getQuantity());
+            if (affectedRows == 0) {
+                throw new IllegalStateException("库存不足或商品不存在");
+            }
+
+        } else if ("RENTAL".equalsIgnoreCase(orderType)) {
+            // 获取租借订单信息
+            RentalOrder order = rentalOrderRepository.findById(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+
+            // 确保订单当前状态为 PENDING
+            if (!OrderStatus.PENDING.equals(order.getOrderStatus())) {
+                throw new IllegalStateException("只有待支付订单才能更新为已支付");
+            }
+
+            // 更新订单状态为 PAID
+            order.setOrderStatus(OrderStatus.PAID);
+            rentalOrderRepository.save(order);
+
+            // 更新库存
+            int affectedRows = productRepository.decrementRentalStock(order.getProductId(), order.getQuantity());
+            if (affectedRows == 0) {
+                throw new IllegalStateException("库存不足或商品不存在");
+            }
+
+        } else {
+            throw new IllegalArgumentException("无效的订单类型: " + orderType);
+        }
     }
 }

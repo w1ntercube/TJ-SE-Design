@@ -228,7 +228,7 @@
           days: 1, // 默认租借天数
           quantity: 1,
           type: 1, // 默认支付方式
-          deposit: 0.1, // 默认押金
+          deposit: 0, // 默认押金
         },
       };
     },
@@ -249,8 +249,8 @@
       },
 
       formattedRentalPrice() {
-        const rentalFee = this.rentalDetails.days * this.rentalDetails.quantity * 0.1;
-        const deposit = 50;
+        const rentalFee = this.rentalDetails.days * this.rentalDetails.quantity * this.product.rentalPrice;
+        const deposit = 50 ;
         const totalPrice = rentalFee + deposit;
         return totalPrice.toFixed(2);
       },
@@ -279,6 +279,7 @@
         })
         .then((response) => {
           this.seller = response.data; // 存储卖家信息
+          this.rentalDetails.deposit = this.product.deposit;
         })
         .catch((error) => {
           console.error("获取商品详情或卖家信息失败:", error);
@@ -484,8 +485,16 @@
           alert("购买数量必须是一个正整数！");
           return;
         }
-        if (this.purchaseDetails.quantity > this.product.stock) {
-          alert("购买数量不能超过商品库存！");
+
+
+        const userId = storedUser.id;
+        const productId = this.product.id;
+        const quantity = this.purchaseDetails.quantity;
+
+        // 检查库存
+        const isStockAvailable = await this.checkStock(productId, quantity, "PURCHASE");
+        if (!isStockAvailable) {
+          alert("购买失败：库存不足！");
           return;
         }
 
@@ -494,14 +503,13 @@
           return;
         }
 
-        const userId = storedUser.id;
         try {
           const payload = new URLSearchParams();
-          payload.append("userId", userId); // 默认用户 ID
-          payload.append("productId", this.product.id); // 商品 ID
-          payload.append("quantity", this.purchaseDetails.quantity); // 用户选择的购买数量
-          payload.append("type", this.purchaseDetails.type); // 用户选择的支付方式
-          payload.append("price", this.formattedPurchasePrice); // 总价格
+          payload.append("userId", userId);
+          payload.append("productId", productId);
+          payload.append("quantity", quantity);
+          payload.append("type", this.purchaseDetails.type);
+          payload.append("price", this.formattedPurchasePrice);
           payload.append("address", this.purchaseDetails.address);
 
           const response = await axios.post("/api/payment/purchase", payload, {
@@ -512,23 +520,24 @@
 
           const { orderId, redirectUrl } = response.data;
 
-          // 保存订单信息到 localStorage
           localStorage.setItem(
             "currentOrder",
             JSON.stringify({
               orderId,
-              productId: this.product.id,
-              price: this.product.price * this.purchaseDetails.quantity,
+              productId,
+              price: this.product.price * quantity,
               paymentType: this.purchaseDetails.type === 1 ? "微信" : "支付宝",
             })
           );
 
           window.location.href = redirectUrl;
+
+          await this.simulatePaymentCompletion();
         } catch (error) {
           console.error("购买失败:", error);
-          alert("购买失败，请稍后再试。");
+          alert("购买失败，请稍后再试！");
         } finally {
-          this.closeDialog(); // 无论成功与否，都关闭弹窗
+          this.closeDialog();
         }
       },
 
@@ -541,6 +550,8 @@
         }
 
         const userId = storedUser.id;
+        const productId = this.product.id;
+        const quantity = this.rentalDetails.quantity;
 
         // 验证用户输入
         if (!this.rentalDetails.days || this.rentalDetails.days <= 0) {
@@ -554,7 +565,13 @@
           return;
         }
 
-        // 验证地址
+        // 检查库存
+        const isStockAvailable = await this.checkStock(productId, quantity, "RENTAL");
+        if (!isStockAvailable) {
+          alert("租借失败：库存不足！");
+          return;
+        }
+
         if (!this.rentalDetails.address || this.rentalDetails.address.trim() === "") {
           alert("请输入有效的配送地址！");
           return;
@@ -565,8 +582,6 @@
           this.closeRentalDialog();
           return;
         }
-
-        const productId = this.product.id;
 
         try {
           const payload = new URLSearchParams();
@@ -602,6 +617,8 @@
           );
 
           window.location.href = redirectUrl;
+
+          await this.simulatePaymentCompletion();
         } catch (error) {
           console.error("租借失败:", error);
           alert("租借失败，请稍后再试。");
@@ -610,6 +627,47 @@
         }
       },
 
+      async checkStock(productId, quantity, type) {
+        try {
+          const response = await axios.get(
+            `/api/products/checkStock?productId=${productId}&quantity=${quantity}&type=${type}`
+          );
+          return response.data.isAvailable; // 返回是否有库存
+        } catch (error) {
+          console.error("库存检查失败:", error);
+          alert("库存检查失败，请稍后再试！");
+          return false;
+        }
+      },
+
+      async queryOrderStatus(orderId) {
+        try {
+          const response = await axios.get(`/api/orders/queryStatus`, {
+            params: { orderId },
+          });
+          const { status, message } = response.data;
+
+          if (status === "success") {
+            alert(message);
+            // 刷新商品详情以更新库存
+            this.fetchProductDetails();
+          } else {
+            alert("订单状态查询失败：" + message);
+          }
+        } catch (error) {
+          console.error("订单状态查询失败:", error);
+          alert("无法查询订单状态，请稍后再试！");
+        }
+      },
+
+      async simulatePaymentCompletion() {
+        // 模拟支付完成后调用订单状态查询
+        setTimeout(async () => {
+          if (this.orderId) {
+            await this.queryOrderStatus(this.orderId);
+          }
+        }, 100);
+      },
 
       async handleBuy() { 
         this.showPurchaseDialog = true;

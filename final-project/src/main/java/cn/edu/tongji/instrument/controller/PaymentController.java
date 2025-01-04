@@ -140,7 +140,7 @@ public class PaymentController {
 
     // 查询订单状态并更新
     @GetMapping("/queryStatus")
-    public Map<String, String> queryOrderStatus(@RequestParam("orderId") Long orderId) {
+    public ResponseEntity<Map<String, String>> queryOrderStatus(@RequestParam("orderId") String orderId) {
         boolean result = paymentService.queryAndUpdateOrderStatus(orderId);
 
         Map<String, String> response = new HashMap<>();
@@ -151,7 +151,7 @@ public class PaymentController {
             response.put("status", "fail");
             response.put("message", "Failed to update order status.");
         }
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/rental/update-dates")

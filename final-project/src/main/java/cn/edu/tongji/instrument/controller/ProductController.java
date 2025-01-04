@@ -15,10 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/products")
@@ -220,6 +217,25 @@ public class ProductController {
         productService.updateProduct(product);
 
         return ResponseEntity.ok("Stock updated successfully");
+    }
+
+    @GetMapping("/checkStock")
+    public ResponseEntity<Map<String, Object>> checkStock(
+            @RequestParam Long productId,
+            @RequestParam Integer quantity,
+            @RequestParam String type
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            boolean isAvailable = productService.checkStock(productId, quantity, type);
+            response.put("isAvailable", isAvailable);
+            response.put("message", isAvailable ? "库存充足" : "库存不足");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("isAvailable", false);
+            response.put("message", "库存检查失败，请稍后再试！");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }
 

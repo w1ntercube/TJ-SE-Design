@@ -5,6 +5,7 @@ import cn.edu.tongji.instrument.entity.PurchaseOrder;
 import cn.edu.tongji.instrument.entity.RentalOrder;
 import cn.edu.tongji.instrument.entity.enums.OrderStatus;
 import cn.edu.tongji.instrument.repository.OrderRepository;
+import cn.edu.tongji.instrument.repository.ProductRepository;
 import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
 import cn.edu.tongji.instrument.util.Md5Util;
@@ -18,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -41,20 +43,27 @@ public class PaymentService {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
 
     public PaymentService(PurchaseOrderRepository purchaseOrderRepository,
                           RentalOrderRepository rentalOrderRepository,
-                          OrderRepository orderRepository) {
+                          OrderRepository orderRepository,
+                          ProductRepository productRepository) {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.rentalOrderRepository = rentalOrderRepository;
         this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
     }
 
     /**
      * 创建购买订单
      */
-    public Long createPurchaseOrder(Long userId, Long productId, Integer quantity, BigDecimal price,String address) {
+    public Long createPurchaseOrder(Long userId,
+                                    Long productId,
+                                    Integer quantity,
+                                    BigDecimal price,
+                                    String address) {
         PurchaseOrder order = new PurchaseOrder();
         order.setUserId(userId);
         order.setProductId(productId);
@@ -184,50 +193,81 @@ public class PaymentService {
     }
 
     // 调用支付平台接口查询订单状态
-    public boolean queryAndUpdateOrderStatus(Long orderId) {
-
-        String requestUrl = paymentUrl + "/checkOrder?orderId=" + orderId;
-
+    public boolean queryAndUpdateOrderStatus(String orderId) {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            // 解析支付平台返回数据
-            String responseBody = response.getBody();
-            PaymentResponse paymentResponse = parseResponse(responseBody);
+        // 构造请求参数
+        Map<String, String> requestParams = new HashMap<>();
+        requestParams.put("orderId", orderId);
 
-            if (paymentResponse == null) {
-                System.out.println("Invalid response from payment platform for orderId: " + orderId);
+        try {
+            // 发起 POST 请求
+            ResponseEntity<String> response = restTemplate.postForEntity(paymentUrl, requestParams, String.class);
+
+            // 检查响应状态
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String responseBody = response.getBody();
+                PaymentResponse paymentResponse = parseResponse(responseBody);
+
+                if (paymentResponse == null) {
+                    System.out.println("Invalid response from payment platform for orderId: " + orderId);
+                    return false;
+                }
+
+                // 查找订单
+                Order order = orderRepository.findById(Long.parseLong(orderId)).orElse(null);
+                if (order == null) {
+                    System.out.println("Order not found for orderId: " + orderId);
+                    return false;
+                }
+
+                // 更新订单状态
+                if (paymentResponse.getCode() == 1) {
+                    // 如果订单已支付
+                    if (order.getOrderStatus() != OrderStatus.PAID) {
+                        order.setOrderStatus(OrderStatus.PAID);
+                        orderRepository.save(order);
+                        updateStockAfterPayment(order); // 更新库存
+                        System.out.println("Order " + orderId + " marked as PAID.");
+                    }
+                } else if (paymentResponse.getCode() == -1) {
+                    // 如果订单未支付并已超时
+                    if (order.getOrderStatus() == OrderStatus.PENDING &&
+                            order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+                        order.setOrderStatus(OrderStatus.CANCELLED);
+                        orderRepository.save(order);
+                        System.out.println("Order " + orderId + " marked as CANCELLED due to timeout.");
+                    }
+                }
+                return true;
+            } else {
+                System.out.println("Failed to query payment platform for orderId: " + orderId);
                 return false;
             }
-
-            // 根据支付状态更新订单
-            Order order = orderRepository.findById(orderId).orElse(null);
-            if (order == null) {
-                System.out.println("Order not found for orderId: " + orderId);
-                return false;
-            }
-
-            if (paymentResponse.getCode() == 1) {
-                // 如果订单已支付
-                if (order.getOrderStatus() != OrderStatus.PAID) {
-                    order.setOrderStatus(OrderStatus.PAID);
-                    orderRepository.save(order);
-                    System.out.println("Order " + orderId + " marked as PAID.");
-                }
-            } else if (paymentResponse.getCode() == -1) {
-                // 如果订单未支付并已超时
-                if (order.getOrderStatus() == OrderStatus.PENDING &&
-                        order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
-                    order.setOrderStatus(OrderStatus.CANCELLED);
-                    orderRepository.save(order);
-                    System.out.println("Order " + orderId + " marked as CANCELLED due to timeout.");
-                }
-            }
-            return true;
-        } else {
-            System.out.println("Failed to query payment platform for orderId: " + orderId);
+        } catch (Exception e) {
+            System.out.println("Error querying payment platform: " + e.getMessage());
             return false;
+        }
+    }
+
+    // 更新库存
+    private void updateStockAfterPayment(Order order) {
+        if (order instanceof PurchaseOrder) {
+            // 处理购买订单库存更新
+            PurchaseOrder purchaseOrder = (PurchaseOrder) order;
+            int affectedRows = productRepository.decrementStock(purchaseOrder.getProductId(), purchaseOrder.getQuantity());
+            if (affectedRows == 0) {
+                throw new IllegalStateException("库存不足或商品不存在，无法更新购买库存！");
+            }
+        } else if (order instanceof RentalOrder) {
+            // 处理租赁订单库存更新
+            RentalOrder rentalOrder = (RentalOrder) order;
+            int affectedRows = productRepository.decrementRentalStock(rentalOrder.getProductId(), rentalOrder.getQuantity());
+            if (affectedRows == 0) {
+                throw new IllegalStateException("库存不足或商品不存在，无法更新租赁库存！");
+            }
+        } else {
+            throw new IllegalArgumentException("未知的订单类型，无法更新库存！");
         }
     }
 

@@ -100,6 +100,21 @@ public class ProductService {
         return productRepository.findBySellerId(sellerId);
     }
 
+    // 检查库存是否充足
+    public boolean checkStock(Long productId, Integer quantity, String type) {
+        // 根据类型选择库存字段
+        int availableStock;
+        if ("PURCHASE".equalsIgnoreCase(type)) {
+            availableStock = productRepository.getStockById(productId);
+        } else if ("RENTAL".equalsIgnoreCase(type)) {
+            availableStock = productRepository.getRentalStockById(productId);
+        } else {
+            throw new IllegalArgumentException("无效的订单类型: " + type);
+        }
+
+        // 检查库存是否足够
+        return quantity <= availableStock;
+    }
 
 }
 

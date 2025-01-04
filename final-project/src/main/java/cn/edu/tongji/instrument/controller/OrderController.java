@@ -4,9 +4,11 @@ import cn.edu.tongji.instrument.entity.*;
 import cn.edu.tongji.instrument.entity.enums.OrderStatus;
 import cn.edu.tongji.instrument.repository.ProductRepository;
 import cn.edu.tongji.instrument.service.OrderService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,5 +69,24 @@ public class OrderController {
     public ResponseEntity<Order> returnOrder(@PathVariable Long id) {
         Order updatedOrder = orderService.returnOrder(id);
         return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<Map<String, String>> payOrder(
+            @PathVariable Long orderId,
+            @RequestParam String orderType
+    ) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            orderService.updateOrderStatusToPaid(orderId, orderType);
+            response.put("message", "订单已成功支付，库存已更新");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            response.put("error", "订单支付失败，请稍后再试");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }
