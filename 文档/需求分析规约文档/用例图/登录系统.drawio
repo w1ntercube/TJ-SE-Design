@@ -1,10 +1,10 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
   <diagram name="第 1 页" id="cmRfAQKsMyv7RrunHl-r">
-    <mxGraphModel dx="3063" dy="1404" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1961" dy="702" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="aR8XhT_5A84DSSFkVJA_-4" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;登录系统&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;startSize=40;" parent="1" vertex="1">
+        <mxCell id="aR8XhT_5A84DSSFkVJA_-4" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;登录子系统&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;startSize=40;" parent="1" vertex="1">
           <mxGeometry x="90" y="80" width="620" height="370" as="geometry" />
         </mxCell>
         <mxCell id="aR8XhT_5A84DSSFkVJA_-5" value="登录" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="aR8XhT_5A84DSSFkVJA_-4" vertex="1">
@@ -34,16 +34,16 @@
         <mxCell id="qnG1Jk8XBLYA4QP3FhH8-1" value="修改密码" style="ellipse;whiteSpace=wrap;html=1;" parent="aR8XhT_5A84DSSFkVJA_-4" vertex="1">
           <mxGeometry x="324" y="140" width="110" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="OfUNL08w6ScQdWS4FfRW-1" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;dashed=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="aR8XhT_5A84DSSFkVJA_-4" source="qnG1Jk8XBLYA4QP3FhH8-1" target="aR8XhT_5A84DSSFkVJA_-5">
+        <mxCell id="OfUNL08w6ScQdWS4FfRW-1" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;dashed=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="aR8XhT_5A84DSSFkVJA_-4" source="qnG1Jk8XBLYA4QP3FhH8-1" target="aR8XhT_5A84DSSFkVJA_-5" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="291" y="335" as="sourcePoint" />
             <mxPoint x="150" y="255" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="OfUNL08w6ScQdWS4FfRW-2" value="原密码验证" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="aR8XhT_5A84DSSFkVJA_-4">
+        <mxCell id="OfUNL08w6ScQdWS4FfRW-2" value="原密码验证" style="ellipse;whiteSpace=wrap;html=1;" parent="aR8XhT_5A84DSSFkVJA_-4" vertex="1">
           <mxGeometry x="470" y="70" width="110" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="OfUNL08w6ScQdWS4FfRW-3" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;dashed=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="aR8XhT_5A84DSSFkVJA_-4" source="qnG1Jk8XBLYA4QP3FhH8-1" target="OfUNL08w6ScQdWS4FfRW-2">
+        <mxCell id="OfUNL08w6ScQdWS4FfRW-3" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;dashed=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="aR8XhT_5A84DSSFkVJA_-4" source="qnG1Jk8XBLYA4QP3FhH8-1" target="OfUNL08w6ScQdWS4FfRW-2" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="620" y="155" as="sourcePoint" />
             <mxPoint x="763" y="130" as="targetPoint" />
@@ -58,7 +58,7 @@
             <mxPoint x="560" y="610" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="aR8XhT_5A84DSSFkVJA_-149" value="&lt;span style=&quot;font-size: 20px;&quot;&gt;用户&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 20px;&quot;&gt;（买家||卖家）&lt;/span&gt;&lt;/div&gt;" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+        <mxCell id="aR8XhT_5A84DSSFkVJA_-149" value="&lt;span style=&quot;font-size: 20px;&quot;&gt;用户&lt;/span&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="-130" y="160" width="80" height="110" as="geometry" />
         </mxCell>
         <mxCell id="aR8XhT_5A84DSSFkVJA_-150" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="aR8XhT_5A84DSSFkVJA_-149" target="aR8XhT_5A84DSSFkVJA_-6" edge="1">
