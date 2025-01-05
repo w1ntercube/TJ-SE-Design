@@ -684,6 +684,8 @@ export default {
           if (response.status === 200) {
             console.log("消费订单数据：", response.data);
             this.consumerOrders = response.data;
+            this.consumerOrders.sort((a, b) => b.id - a.id); // 降序排序
+
             // 提取订单ID，按降序排列并取前10个
             const recentOrderIds = this.consumerOrders
               .map(order => order.id)

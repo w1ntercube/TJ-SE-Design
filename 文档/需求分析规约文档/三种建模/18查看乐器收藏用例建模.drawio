@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.1 Chrome/112.0.5615.87 Electron/24.1.2 Safari/537.36" modified="2024-12-19T03:21:05.927Z" version="21.2.1" etag="BBd2l8kOzWaRpm7DcepS" type="device" pages="2">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2" pages="2">
   <diagram name="功能建模" id="NBFd98P7RPhy97YwyTXO">
     <mxGraphModel dx="2120" dy="1333" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -82,80 +82,84 @@
     </mxGraphModel>
   </diagram>
   <diagram id="jpp94Eph6kHTiTMXWwHy" name="行为建模">
-    <mxGraphModel dx="1193" dy="-419" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="628" dy="-797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-1" value="" style="ellipse;fillColor=strokeColor;" parent="1" vertex="1">
-          <mxGeometry x="40" y="1470" width="14" height="14" as="geometry" />
+        <mxCell id="wPBKHmemz3kmRKiScDq1-2" value="" style="group;strokeWidth=11;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="350" y="1754" width="160" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-2" value="用户登录并选择“查看收藏”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="104" y="1460" width="208" height="34" as="geometry" />
+        <mxCell id="wPBKHmemz3kmRKiScDq1-3" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-2">
+          <mxGeometry width="160" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-3" value="系统加载收藏列表" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="354" y="1460" width="133" height="34" as="geometry" />
+        <mxCell id="wPBKHmemz3kmRKiScDq1-4" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.rect;fillColor2=none;strokeWidth=1;size=20;indent=5;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-2">
+          <mxGeometry y="40" width="160" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="U0vVMDpN4uEW9vUhK3SO-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="_kaFdZga2YwOmqoQ8z7h-6" target="_kaFdZga2YwOmqoQ8z7h-7" edge="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="wPBKHmemz3kmRKiScDq1-5" value="修改乐器收藏状态" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-2">
+          <mxGeometry y="10" width="160" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-6" value="系统显示收藏乐器" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="543" y="1460" width="101" height="34" as="geometry" />
+        <mxCell id="wPBKHmemz3kmRKiScDq1-6" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;userId，productId，cartsId&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-2">
+          <mxGeometry y="45" width="160" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="U0vVMDpN4uEW9vUhK3SO-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="_kaFdZga2YwOmqoQ8z7h-7" target="_kaFdZga2YwOmqoQ8z7h-3" edge="1">
+        <mxCell id="wPBKHmemz3kmRKiScDq1-7" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;用户选择加入收藏或者取消收藏&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-2">
+          <mxGeometry y="80" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="wPBKHmemz3kmRKiScDq1-6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1814" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-11" value="&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;用户进入乐器详情界面&lt;/span&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="212" y="1787" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-20" value="" style="ellipse;shape=endState;fillColor=strokeColor;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1807" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="wPBKHmemz3kmRKiScDq1-21" target="wPBKHmemz3kmRKiScDq1-6">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="720" y="1547" />
-              <mxPoint x="720" y="1410" />
-              <mxPoint x="420" y="1410" />
+              <mxPoint x="210" y="1937" />
+              <mxPoint x="210" y="1814" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Q83TTVuORPwhv5EKMIXP-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="_kaFdZga2YwOmqoQ8z7h-7" target="Q83TTVuORPwhv5EKMIXP-23" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="iukceVt6yJnzFC3oK-OI-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="_kaFdZga2YwOmqoQ8z7h-7" target="Q83TTVuORPwhv5EKMIXP-20">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-7" value="用户选择具体乐器" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="543" y="1530" width="100" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-9" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="_kaFdZga2YwOmqoQ8z7h-1" target="_kaFdZga2YwOmqoQ8z7h-2" edge="1">
+        <mxCell id="wPBKHmemz3kmRKiScDq1-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="wPBKHmemz3kmRKiScDq1-21" target="wPBKHmemz3kmRKiScDq1-27">
           <mxGeometry relative="1" as="geometry">
-            <Array as="points" />
+            <Array as="points">
+              <mxPoint x="210" y="1937" />
+              <mxPoint x="210" y="2067" />
+            </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-10" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="_kaFdZga2YwOmqoQ8z7h-2" target="_kaFdZga2YwOmqoQ8z7h-3" edge="1">
-          <mxGeometry x="0.0026" relative="1" as="geometry">
-            <Array as="points" />
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-21" value="" style="ellipse;fillColor=strokeColor;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1930" width="14" height="14" as="geometry" />
         </mxCell>
-        <mxCell id="_kaFdZga2YwOmqoQ8z7h-11" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;rounded=0;" parent="1" source="_kaFdZga2YwOmqoQ8z7h-3" target="_kaFdZga2YwOmqoQ8z7h-6" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points" />
-            <mxPoint x="666" y="1476.9999999999995" as="targetPoint" />
-          </mxGeometry>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-23" value="" style="group;strokeWidth=11;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="350" y="2000" width="160" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="iukceVt6yJnzFC3oK-OI-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Q83TTVuORPwhv5EKMIXP-20" target="Q83TTVuORPwhv5EKMIXP-27">
+        <mxCell id="wPBKHmemz3kmRKiScDq1-24" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-23">
+          <mxGeometry width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-25" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.rect;fillColor2=none;strokeWidth=1;size=20;indent=5;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-23">
+          <mxGeometry y="40" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-26" value="取消收藏乐器" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-23">
+          <mxGeometry y="10" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-27" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;userId，productId，cartsId&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-23">
+          <mxGeometry y="45" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-28" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;用户选择取消收藏&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="wPBKHmemz3kmRKiScDq1-23">
+          <mxGeometry y="80" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-30" value="&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;用户进入我的收藏界面&lt;/span&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="212" y="2040" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-31" value="" style="ellipse;shape=endState;fillColor=strokeColor;" vertex="1" parent="1">
+          <mxGeometry x="600" y="2053" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="wPBKHmemz3kmRKiScDq1-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="wPBKHmemz3kmRKiScDq1-27" target="wPBKHmemz3kmRKiScDq1-31">
           <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="Q83TTVuORPwhv5EKMIXP-20" value="页面跳转到乐器详情页" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="274" y="1530" width="130" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="iukceVt6yJnzFC3oK-OI-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Q83TTVuORPwhv5EKMIXP-23" target="Q83TTVuORPwhv5EKMIXP-25">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="Q83TTVuORPwhv5EKMIXP-23" value="用户移除收藏商品" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="534.5" y="1610" width="118" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="iukceVt6yJnzFC3oK-OI-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="Q83TTVuORPwhv5EKMIXP-25" target="Q83TTVuORPwhv5EKMIXP-27">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="Q83TTVuORPwhv5EKMIXP-25" value="系统更新收藏数据" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="280" y="1610" width="118" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="Q83TTVuORPwhv5EKMIXP-27" value="" style="ellipse;shape=endState;fillColor=strokeColor;" parent="1" vertex="1">
-          <mxGeometry x="130" y="1580" width="14" height="14" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -582,13 +582,13 @@
           this.closeRentalDialog();
           return;
         }
-
+        // const deposit = parseFloat(this.rentalDetails.deposit).toFixed(2);
         try {
           const payload = new URLSearchParams();
           payload.append("userId", userId);
           payload.append("productId", productId);
           payload.append("days", this.rentalDetails.days); // 租借天数
-          payload.append("deposit", this.rentalDetails.deposit.toFixed(2));
+          payload.append("deposit", 50.00);
           payload.append("price", this.formattedRentalPrice);
           payload.append("quantity", this.rentalDetails.quantity);
           payload.append("type", this.rentalDetails.type);
@@ -618,7 +618,7 @@
 
           window.location.href = redirectUrl;
 
-          await this.simulatePaymentCompletion();
+          // await this.simulatePaymentCompletion();
         } catch (error) {
           console.error("租借失败:", error);
           alert("租借失败，请稍后再试。");

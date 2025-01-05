@@ -159,137 +159,77 @@
     </mxGraphModel>
   </diagram>
   <diagram id="jpp94Eph6kHTiTMXWwHy" name="行为建模">
-    <mxGraphModel dx="1501" dy="722" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1884" dy="-53" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="bKNmPZExNVrJnijVossD-1" value="" style="ellipse;fillColor=strokeColor;" parent="1" vertex="1">
-          <mxGeometry x="20" y="1015" width="14" height="14" as="geometry" />
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-1" value="" style="group;strokeWidth=11;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="280" y="1620" width="160" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-2" value="管理员登录并选择“管理乐器”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="84" y="1005" width="225" height="34" as="geometry" />
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-2" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-1">
+          <mxGeometry width="160" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-3" target="bKNmPZExNVrJnijVossD-17" edge="1">
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-3" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.rect;fillColor2=none;strokeWidth=1;size=20;indent=5;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-1">
+          <mxGeometry y="40" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-4" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;选择乐器&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-1">
+          <mxGeometry y="10" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-5" value="&lt;span style=&quot;font-size: 13px;&quot;&gt;userId，productId&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-1">
+          <mxGeometry y="45" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-6" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;管理员选择要管理的乐器&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-1">
+          <mxGeometry y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5tzHAiUTyCVC9n17k_2t-7" target="5tzHAiUTyCVC9n17k_2t-5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-3" target="bKNmPZExNVrJnijVossD-4" edge="1">
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-7" value="" style="ellipse;fillColor=strokeColor;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1673" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-9" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;管理员登录并进入乐器管理页面&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1650" width="190" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-10" value="" style="group;strokeWidth=11;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="580" y="1620" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-11" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-10">
+          <mxGeometry width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-12" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.rect;fillColor2=none;strokeWidth=1;size=20;indent=5;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-10">
+          <mxGeometry y="40" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-13" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;下架乐器&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-10">
+          <mxGeometry y="10" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-14" value="&lt;span style=&quot;font-size: 13px;&quot;&gt;userId，productId，isActive&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-10">
+          <mxGeometry y="45" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-15" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;管理员对目标乐器选择下架&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="5tzHAiUTyCVC9n17k_2t-10">
+          <mxGeometry y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5tzHAiUTyCVC9n17k_2t-5" target="5tzHAiUTyCVC9n17k_2t-14">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-3" value="系统展示乐器列表" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="350" y="1005" width="109" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-4" target="bKNmPZExNVrJnijVossD-5" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-4" value="管理员选择乐器" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="490" y="1005" width="92" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-5" target="bKNmPZExNVrJnijVossD-6" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="bKNmPZExNVrJnijVossD-5" target="hdM-RXxYGU5kriTZJFo0-1" edge="1">
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5tzHAiUTyCVC9n17k_2t-15" target="5tzHAiUTyCVC9n17k_2t-6">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1300" y="1030" as="targetPoint" />
+            <mxPoint x="360" y="1750" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="660" y="1800" />
+              <mxPoint x="360" y="1800" />
+            </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yMRZb7nt4KNeN_PCIfyN-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-5" target="bKNmPZExNVrJnijVossD-14" edge="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-19" value="&lt;div style=&quot;text-align: center;&quot;&gt;打印返回信息&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="1770" width="190" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-5" value="管理员选择操作" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="613.5" y="994.5" width="100" height="55" as="geometry" />
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-20" value="" style="ellipse;shape=endState;fillColor=strokeColor;" vertex="1" parent="1">
+          <mxGeometry x="353" y="1510" width="14" height="14" as="geometry" />
         </mxCell>
-        <mxCell id="hdM-RXxYGU5kriTZJFo0-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-6" target="bKNmPZExNVrJnijVossD-3" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-6" value="查看乐器详细信息" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="597" y="893" width="133" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-8" value="审核通过" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="863.5" y="950" width="75" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="auIWDvBVuZOeTNhMvawQ-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bKNmPZExNVrJnijVossD-9">
+        <mxCell id="5tzHAiUTyCVC9n17k_2t-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="5tzHAiUTyCVC9n17k_2t-2" target="5tzHAiUTyCVC9n17k_2t-20">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1210" y="967" as="targetPoint" />
+            <mxPoint x="360" y="1610" as="sourcePoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-9" value="更新乐器状态为“已上架”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="980" y="950" width="111" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="auIWDvBVuZOeTNhMvawQ-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bKNmPZExNVrJnijVossD-10">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="430" y="1040" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-10" value="记录日志" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="938.5" y="1180" width="90" height="43" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-11" value="审核不通过" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="870" y="1056.5" width="62" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="auIWDvBVuZOeTNhMvawQ-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bKNmPZExNVrJnijVossD-12">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1210" y="1073.5" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-12" value="填写拒绝原因" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="980" y="1056.5" width="102" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-14" value="下架乐器" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="616" y="1120" width="95" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="XsNurRPnW_R44Xe0uzZu-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="bKNmPZExNVrJnijVossD-15" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1211" y="1137" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-15" value="更新乐器状态为“不可用”" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="751" y="1120" width="119" height="34" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-17" value="" style="ellipse;shape=endState;fillColor=strokeColor;" parent="1" vertex="1">
-          <mxGeometry x="370" y="1230" width="14" height="14" as="geometry" />
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-18" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="bKNmPZExNVrJnijVossD-1" target="bKNmPZExNVrJnijVossD-2" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-19" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="bKNmPZExNVrJnijVossD-2" target="bKNmPZExNVrJnijVossD-3" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-25" value="" style="curved=1;startArrow=none;;exitX=0.99;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="bKNmPZExNVrJnijVossD-8" target="bKNmPZExNVrJnijVossD-9" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-29" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="bKNmPZExNVrJnijVossD-11" target="bKNmPZExNVrJnijVossD-12" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="bKNmPZExNVrJnijVossD-33" value="" style="curved=1;startArrow=none;;exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" parent="1" source="bKNmPZExNVrJnijVossD-14" target="bKNmPZExNVrJnijVossD-15" edge="1">
-          <mxGeometry x="0.0037" relative="1" as="geometry">
-            <Array as="points" />
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="hdM-RXxYGU5kriTZJFo0-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="hdM-RXxYGU5kriTZJFo0-1" target="bKNmPZExNVrJnijVossD-11" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="yMRZb7nt4KNeN_PCIfyN-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="hdM-RXxYGU5kriTZJFo0-1" target="bKNmPZExNVrJnijVossD-8" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="hdM-RXxYGU5kriTZJFo0-1" value="审核乐器上架" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="740" y="1001.75" width="100" height="40.5" as="geometry" />
-        </mxCell>
-        <mxCell id="XsNurRPnW_R44Xe0uzZu-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="XsNurRPnW_R44Xe0uzZu-1" target="bKNmPZExNVrJnijVossD-10" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="800" y="1201.5" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="XsNurRPnW_R44Xe0uzZu-1" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;rotation=90;" parent="1" vertex="1">
-          <mxGeometry x="1101.43" y="1037.07" width="234.28" height="10" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
