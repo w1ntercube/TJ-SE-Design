@@ -3,26 +3,18 @@ package cn.edu.tongji.instrument.dto;
 
 public class QwenRequestBody {
     private String model;
-    private Message[] messages;
+    private QwenMessage[] qwenMessages;
 
-    public QwenRequestBody(String model, Message[] messages) {
+    public QwenRequestBody(String model, QwenMessage[] qwenMessages) {
         this.model = model;
-        this.messages = messages;
+        this.qwenMessages = qwenMessages;
     }
 
-    public String getModel() {
-        return model;
+    public QwenMessage[] getMessages() {
+        return qwenMessages;
     }
 
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public Message[] getMessages() {
-        return messages;
-    }
-
-    public void setMessages(Message[] messages) {
-        this.messages = messages;
+    public void setMessages(QwenMessage[] qwenMessages) {
+        this.qwenMessages = qwenMessages;
     }
 }

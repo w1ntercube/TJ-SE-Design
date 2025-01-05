@@ -1,7 +1,7 @@
 package cn.edu.tongji.instrument.service;
 
 
-import cn.edu.tongji.instrument.dto.Message;
+import cn.edu.tongji.instrument.dto.QwenMessage;
 import cn.edu.tongji.instrument.dto.QwenRequestBody;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +30,11 @@ public class QwenService {
             // 构建请求体
             QwenRequestBody qwenRequestBody = new QwenRequestBody(
                     "qwen-plus",
-                    new Message[] {
-                            new Message("system", "你是一个乐器知识相关的专家，你的名字是强尼，只能回答与乐器知识相关的问题。" +
+                    new QwenMessage[] {
+                            new QwenMessage("system", "你是一个乐器知识相关的专家，你的名字是强尼，只能回答与乐器知识相关的问题。" +
                                     "回答内容以纯文本的形式显示，不要超过300字。" +
                                     "对于与乐器无关的问题，一律回答：抱歉，这不是乐器知识方面的问题哦！"),
-                            new Message("user", userMessage)
+                            new QwenMessage("user", userMessage)
                     }
             );
 
