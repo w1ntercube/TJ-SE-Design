@@ -517,22 +517,25 @@
               "Content-Type": "application/x-www-form-urlencoded",
             },
           });
+          
+          // const { orderId, redirectUrl } = response.data;
 
-          const { orderId, redirectUrl } = response.data;
+          const { message } = response.data;
+          alert(message || "购买成功！");
 
-          localStorage.setItem(
-            "currentOrder",
-            JSON.stringify({
-              orderId,
-              productId,
-              price: this.product.price * quantity,
-              paymentType: this.purchaseDetails.type === 1 ? "微信" : "支付宝",
-            })
-          );
+          // localStorage.setItem(
+          //   "currentOrder",
+          //   JSON.stringify({
+          //     orderId,
+          //     productId,
+          //     price: this.product.price * quantity,
+          //     paymentType: this.purchaseDetails.type === 1 ? "微信" : "支付宝",
+          //   })
+          // );
 
-          window.location.href = redirectUrl;
+          // window.location.href = redirectUrl;
 
-          await this.simulatePaymentCompletion();
+          // await this.simulatePaymentCompletion();
         } catch (error) {
           console.error("购买失败:", error);
           alert("购买失败，请稍后再试！");
@@ -602,21 +605,24 @@
             },
           });
 
-          const { orderId, redirectUrl } = response.data;
+          // const { orderId, redirectUrl } = response.data;
 
-          localStorage.setItem(
-            "currentRentalOrder",
-            JSON.stringify({
-              orderId,
-              productId,
-              rentalDays: this.rentalDetails.days,
-              deposit: this.rentalDetails.deposit,
-              price: this.product.price,
-              paymentType: this.rentalDetails.type === 1 ? "微信" : "支付宝",
-            })
-          );
+          const { message } = response.data;
 
-          window.location.href = redirectUrl;
+          alert(message || "租借成功！");
+          // localStorage.setItem(
+          //   "currentRentalOrder",
+          //   JSON.stringify({
+          //     orderId,
+          //     productId,
+          //     rentalDays: this.rentalDetails.days,
+          //     deposit: this.rentalDetails.deposit,
+          //     price: this.product.price,
+          //     paymentType: this.rentalDetails.type === 1 ? "微信" : "支付宝",
+          //   })
+          // );
+
+          // window.location.href = redirectUrl;
 
           // await this.simulatePaymentCompletion();
         } catch (error) {

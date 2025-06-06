@@ -6,6 +6,8 @@ import cn.edu.tongji.instrument.repository.PurchaseOrderRepository;
 import cn.edu.tongji.instrument.repository.RentalOrderRepository;
 
 import cn.edu.tongji.instrument.service.PaymentService;
+import cn.edu.tongji.instrument.service.OrderService;
+
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,16 +32,19 @@ public class PaymentController {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final RentalOrderRepository rentalOrderRepository;
     private final PaymentService paymentService;
+    private final OrderService orderService;
 
     public PaymentController(OrderRepository orderRepository,
                              PurchaseOrderRepository purchaseOrderRepository,
                              RentalOrderRepository rentalOrderRepository,
-                             PaymentService paymentService)
+                             PaymentService paymentService,
+                             OrderService orderService)
     {
         this.orderRepository = orderRepository;
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.rentalOrderRepository = rentalOrderRepository;
         this.paymentService = paymentService;
+        this.orderService = orderService;
     }
 
     // 提交支付请求（购买订单）
@@ -52,7 +57,32 @@ public class PaymentController {
             @RequestParam("price") BigDecimal price,
             @RequestParam("address") String address
     ) {
+        Map<String, String> response = new HashMap<>();
 
+        try {
+            // 1. 创建购买订单
+            Long orderId = paymentService.createPurchaseOrder(userId, productId, quantity, price, address);
+            System.out.println("✅ 已创建购买订单，订单ID：" + orderId);
+
+            // 2. 立即模拟支付并扣减库存
+            orderService.updateOrderStatusToPaid(orderId, "PURCHASE");
+            System.out.println("✅ 已模拟购买支付成功并扣减库存");
+
+            // 3. 返回响应
+            response.put("orderId", orderId.toString());
+            response.put("status", "success");
+            response.put("message", "购买成功，订单已支付");
+            return response;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "fail");
+            response.put("message", "购买失败：" + e.getMessage());
+            return response;
+        }
+
+        // ------------------ 原有逻辑 ------------------
+        /*
         // 调用 Service 层创建购买订单
         Long orderId = paymentService.createPurchaseOrder(userId, productId, quantity, price,address);
         System.out.println("PaymentController类里的createPurchaseOrder方法调用了PaymentService类里的createPurchaseOrder方法。");
@@ -70,7 +100,7 @@ public class PaymentController {
         response.put("price", price.toString());
         response.put("redirectUrl", redirectUrl);
         return response;
-
+        */
     }
 
     @PostMapping("/rental")
@@ -85,7 +115,33 @@ public class PaymentController {
             @RequestParam("address") String address,
             Model model
     ) {
+        Map<String, String> response = new HashMap<>();
 
+        try {
+            // 1. 创建订单
+            Long orderId = paymentService.createRentalOrder(userId, productId, days, deposit, price, quantity, address);
+            System.out.println("✅ 已创建租借订单，订单ID：" + orderId);
+
+            // 2. 立即更新订单为“已支付” + 减库存
+            orderService.updateOrderStatusToPaid(orderId, "RENTAL");
+            System.out.println("✅ 已模拟支付成功并扣减库存");
+
+            // 3. 返回响应
+            response.put("orderId", orderId.toString());
+            response.put("status", "success");
+            response.put("message", "租借成功，订单已支付");
+
+            return response;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "fail");
+            response.put("message", "租借失败：" + e.getMessage());
+            return response;
+        }
+
+        // ------------------ 原有逻辑 ------------------
+        /*
         // 调用 Service 层创建租赁订单
         Long orderId = paymentService.createRentalOrder(
                 userId, productId, days, deposit, price, quantity, address
@@ -106,6 +162,8 @@ public class PaymentController {
         response.put("redirectUrl", redirectUrl);
 
         return response;
+        */
+
     }
 
     // 回调接口
