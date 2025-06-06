@@ -1,0 +1,38 @@
+# Frontend (Vue) 
+/frontend/vue-frontend/node_modules/
+/frontend/vue-frontend/dist/
+/frontend/vue-frontend/.env.local
+/frontend/vue-frontend/.temp/
+/frontend/vue-frontend/.cache/
+
+# Backend (Spring Boot) 
+/final-project/target/
+/final-project/.idea/
+/final-project/*.iml
+/final-project/logs/
+/final-project/.env
+
+# Maven
+.mvn/
+!mvnw
+!mvnw.cmd
+
+# 通用
+*.log
+*.class
+*.jar
+*.war
+*.iml
+*.tmp
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+
+# VSCode
+.vscode/
+
+
+# 上传目录和临时资源
+/uploads/
