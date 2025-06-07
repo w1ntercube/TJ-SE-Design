@@ -850,6 +850,47 @@ export default {
       }
     },
 
+    // async sendMessage() {
+    //   if (this.userInput.trim() === "") {
+    //     alert("请输入内容后发送！");
+    //     return;
+    //   }
+
+    //   // 添加用户消息到消息列表
+    //   this.messages.push({
+    //     sender: "user",
+    //     content: this.userInput,
+    //   });
+
+    //   // 暂存用户输入并清空输入框
+    //   const inputMessage = this.userInput;
+    //   this.userInput = "";
+
+    //   try {
+    //     // 向后端发送请求
+    //     const response = await axios.post("http://localhost:8080/api/chat", null, {
+    //       params: {
+    //         message: inputMessage,
+    //       },
+    //     });
+
+    //     // 提取后端返回的 content
+    //     const content = response.data.choices[0].message.content;
+
+    //     // 添加 AI 的回复到消息列表
+    //     this.messages.push({
+    //       sender: "ai",
+    //       content: content,
+    //     });
+    //   } catch (error) {
+    //     console.error("请求失败:", error);
+    //     this.messages.push({
+    //       sender: "ai",
+    //       content: "抱歉，我无法连接到服务器，请稍后重试。",
+    //     });
+    //   }
+    // },
+
     async sendMessage() {
       if (this.userInput.trim() === "") {
         alert("请输入内容后发送！");
@@ -862,7 +903,6 @@ export default {
         content: this.userInput,
       });
 
-      // 暂存用户输入并清空输入框
       const inputMessage = this.userInput;
       this.userInput = "";
 
@@ -874,8 +914,8 @@ export default {
           },
         });
 
-        // 提取后端返回的 content
-        const content = response.data.choices[0].message.content;
+        // 提取后端返回的 content（直接是字符串）
+        const content = response.data;
 
         // 添加 AI 的回复到消息列表
         this.messages.push({
@@ -890,8 +930,6 @@ export default {
         });
       }
     },
-
-
 
     goBack() {
         // 返回上一页
