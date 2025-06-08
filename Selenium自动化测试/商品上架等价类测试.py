@@ -14,12 +14,13 @@ from selenium.common.exceptions import NoAlertPresentException
 temp_user_data_dir = tempfile.mkdtemp(prefix="selenium_profile_")  # 系统自动生成唯一文件夹
 print(f"✅ 使用的用户目录: {temp_user_data_dir}")
 # ----------------------------------------------------------------------
-# ANSI color codes for terminal output
-COLOR_GREEN = "\033[92m"   # ✅ Success
-COLOR_RED = "\033[91m"     # ❌ Error
-COLOR_BLUE = "\033[94m"    # ℹ️ Info
-COLOR_YELLOW = "\033[93m"  # 📢 Alert
-COLOR_RESET = "\033[0m"    # Reset to default
+
+# ANSI color codes
+COLOR_GREEN = "\033[92m"
+COLOR_RED = "\033[91m"
+COLOR_YELLOW = "\033[93m"
+COLOR_BLUE = "\033[94m"
+COLOR_RESET = "\033[0m"
 
 
 # ----------------- CONFIG -------------------
@@ -30,7 +31,7 @@ UPLOAD_IMG_INVALID = r"C:\Users\aleph\OneDrive\桌面\record.txt"
 LOGIN_URL = "http://localhost:8081/"
 TARGET_URL = "http://localhost:8081/profile"
 WAIT_TIME = 2
-long_desc = "A"*1001
+long_desc = "A"*501
 # ---------------------------------------------
 
 # Test cases (R1–R10)
@@ -131,8 +132,8 @@ test_cases = [
         "rental_price": "50.00",
         "stock": "10",
         "rental_stock": "5",
-        "description": "long description"+long_desc,
-        "file": UPLOAD_IMG_INVALID,
+        "description": long_desc,
+        "file": UPLOAD_IMG_VALID,
     },
     {
         "name": "",
@@ -170,11 +171,11 @@ time.sleep(WAIT_TIME)
 # ✅ Step 2: Handle alert if present
 try:
     alert = driver.switch_to.alert
-    print(f"{COLOR_YELLOW} Alert detected: {alert.text}")
+    print(f"{COLOR_YELLOW}Alert detected: {alert.text}{COLOR_RESET}")
     alert.accept()
     time.sleep(WAIT_TIME)
 except:
-    print(f"No alert detected, proceeding{COLOR_GREEN}")
+    print(f"{COLOR_GREEN}No alert detected, proceeding{COLOR_RESET}")
 
 # Step 3: Navigate to "Add Product" page
 try:
@@ -184,27 +185,37 @@ try:
     upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "上架商品")]')))
     upload_button.click()
     time.sleep(WAIT_TIME)
-    print(f"Successfully navigated to the product upload page{COLOR_GREEN}")
+    print(f"{COLOR_GREEN}Successfully navigated to the product upload page{COLOR_RESET}")
 except Exception as e:
-    print(f"Failed to click 'Add Product' button: {e} {COLOR_RED}")
+    print(f"{COLOR_RED}Failed to click 'Add Product' button: {e}{COLOR_RESET}")
     driver.quit()
     shutil.rmtree(temp_user_data_dir, ignore_errors=True)
     exit()
 
 # Step 4: Execute each test case
+success_upload_count = 0
+failed_upload_count = 0
+
 for idx, case in enumerate(test_cases):
-    print(f" [R{idx+1}] Executing test case: {case['description']} {COLOR_GREEN}")
+    print(f"{COLOR_BLUE}[R{idx+1}] Executing test case: {case['description']}{COLOR_RESET}")
+    
+    # Skip specific cases not testable from frontend
+    if "invalid seller_id" in case["description"] or "invalid is_active status" in case["description"]:
+        print(f"{COLOR_YELLOW}Test R{idx+1} skipped due to backend-only field: {case['description']}{COLOR_RESET}")
+        print(f"{COLOR_RED}Test R{idx+1}: Counted as product upload failed (not testable via frontend){COLOR_RESET}")
+        failed_upload_count += 1
+        continue
+
     try:
-        # Refresh page
         driver.get(TARGET_URL)
         time.sleep(WAIT_TIME)
-        
+
         wait = WebDriverWait(driver, 2)
         upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "上架商品")]')))
         upload_button.click()
         time.sleep(WAIT_TIME)
 
-        # fill form
+        # Fill form
         if case["file"]:
             driver.find_element(By.XPATH, '//input[@type="file"]').send_keys(case["file"])
         driver.find_elements(By.TAG_NAME, 'input')[1].clear()
@@ -220,25 +231,40 @@ for idx, case in enumerate(test_cases):
         driver.find_element(By.TAG_NAME, 'textarea').clear()
         driver.find_element(By.TAG_NAME, 'textarea').send_keys(case["description"])
 
-        # confirm form
-        driver.find_element(By.XPATH, '//button[contains(text(), "上架商品")]').click()
+        # Submit form
+        driver.find_element(By.XPATH, '//form//button[@type="submit" and contains(text(), "上架商品")]').click()
         time.sleep(WAIT_TIME)
 
-        # handle alert if present
+        # Check alert
         try:
             alert = driver.switch_to.alert
-            print(f"Alert message: {alert.text} {COLOR_YELLOW}")
+            alert_text = alert.text
+            print(f"{COLOR_YELLOW}Alert message: {alert_text}{COLOR_RESET}")
             alert.accept()
-        except NoAlertPresentException:
-            print(f"No alert shown {COLOR_BLUE}")
 
-        print(f"Test R{idx+1} completed{COLOR_GREEN}")
+            if "商品上传成功" in alert_text:
+                print(f"{COLOR_GREEN}Test R{idx+1}: Product uploaded successfully{COLOR_RESET}")
+                success_upload_count += 1
+            else:
+                print(f"{COLOR_RED}Test R{idx+1}: Product NOT uploaded successfully{COLOR_RESET}")
+                failed_upload_count += 1
+
+        except NoAlertPresentException:
+            print(f"{COLOR_BLUE}No alert shown{COLOR_RESET}")
+            print(f"{COLOR_RED}Test R{idx+1}: Product NOT uploaded successfully (no confirmation){COLOR_RESET}")
+            failed_upload_count += 1
 
     except Exception as e:
-        print(f"Test R{idx+1} failed with error: {e} {COLOR_RED}")
+        print(f"{COLOR_RED}Test R{idx+1} failed with error: {e}{COLOR_RESET}")
+        failed_upload_count += 1
 
-# Cleanup
+# ✅ Cleanup
 driver.quit()
 shutil.rmtree(temp_user_data_dir, ignore_errors=True)
-print(f"Temporary Edge user-data-dir cleaned up {COLOR_GREEN}")
-print(f"\n All decision table test cases executed.{COLOR_GREEN}")
+print(f"{COLOR_GREEN}Temporary Edge user-data-dir cleaned up{COLOR_RESET}")
+
+# ✅ Summary
+print(f"\n{COLOR_BLUE}==== TEST EXECUTION SUMMARY ===={COLOR_RESET}")
+print(f"{COLOR_GREEN}Uploaded successfully: {success_upload_count}{COLOR_RESET}")
+print(f"{COLOR_RED}Upload failed: {failed_upload_count}{COLOR_RESET}")
+print(f"{COLOR_BLUE}Total test cases executed: {success_upload_count + failed_upload_count}{COLOR_RESET}")
