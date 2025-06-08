@@ -186,30 +186,50 @@ public class ProductController {
     }
     // 调整出售库存
     @PostMapping("/adjustSellStock")
-    public ResponseEntity<String> adjustSellStock(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<Map<String, Object>> adjustSellStock(@RequestBody Map<String, Object> request) {
         Long productId = ((Number) request.get("productId")).longValue();
         Integer quantity = ((Number) request.get("quantity")).intValue();
 
         Optional<Product> productOptional = productService.getProductById(productId);
-        System.out.println("ProductController类里的adjustSellStock方法调用了productService类里的getProductById方法。");
-
         if (productOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("Product not found");
+            return ResponseEntity.status(404).body(Map.of(
+                    "success", false,
+                    "message", "Product not found"
+            ));
         }
 
         Product product = productOptional.get();
         int currentStock = product.getStock();
-        // 判断库存减少量是否大于当前库存
-        if (quantity + currentStock < 0) {
-            return ResponseEntity.status(400).body("Insufficient stock to reduce by " + quantity * -1);
+        int newStock = currentStock + quantity;
+
+        if (newStock < 0) {
+            return ResponseEntity.status(400).body(Map.of(
+                    "success", false,
+                    "message", "Insufficient stock to reduce by " + (-quantity),
+                    "newStock", currentStock,
+                    "status", "Insufficient"
+            ));
         }
 
-        product.setStock(product.getStock() + quantity); // 增加库存
+        product.setStock(newStock);
         productService.updateProduct(product);
-        System.out.println("ProductController类里的adjustSellStock方法调用了productService类里的updateProduct方法。");
 
-        return ResponseEntity.ok("Stock updated successfully");
+        // 推断库存状态（根据业务自行设定阈值）
+        String status;
+        if (newStock == 0) {
+            status = "Zero";
+        } else {
+            status = "Sufficient";
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Stock updated successfully",
+                "newStock", newStock,
+                "status", status
+        ));
     }
+
     // 减少库存
     @PostMapping("/adjustRentStock")
     public ResponseEntity<String> adjustRentStock(@RequestBody Map<String, Object> request) {
