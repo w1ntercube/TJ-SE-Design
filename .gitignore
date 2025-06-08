@@ -36,3 +36,6 @@
 
 # 上传目录和临时资源
 final-project/uploads
+
+# edgeDriver 驱动
+edge_profile/
