@@ -227,7 +227,7 @@ public class ProductController {
         int currentStock = product.getStock();
         int newStock = currentStock + quantity;
 
-        if (newStock < 0) {
+        if (quantity < 0 && newStock < 0) {
             return ResponseEntity.status(400).body(Map.of(
                     "success", false,
                     "message", "Insufficient stock to reduce by " + (-quantity),
