@@ -136,8 +136,33 @@ public class ProductController {
         productDTO.setSellerId(sellerId);
         productDTO.setIsActive(isActive);
 
-        // 校验逻辑
-        if (productDTO.getName() == null || productDTO.getName().isEmpty()) {
+        // 校验商品名：非空 且 长度 ≤ 50
+        if (productDTO.getName() == null || productDTO.getName().trim().isEmpty() || productDTO.getName().length() > 50) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // 校验价格与租金 > 0（不能为 0）
+        if (productDTO.getPrice() == null || productDTO.getPrice().compareTo(BigDecimal.ZERO) <= 0 ||
+                productDTO.getRentalPrice() == null || productDTO.getRentalPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // 校验库存：stock 和 rental_stock ≥ 0，且不超过最大限制（如 999999）
+        int MAX_STOCK = 999999;
+        if (productDTO.getStock() < 0 || productDTO.getStock() > MAX_STOCK ||
+                productDTO.getRentalStock() < 0 || productDTO.getRentalStock() > MAX_STOCK) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // 校验商品描述长度（最大1000字符，允许为空）
+        if (productDTO.getDescription() != null && productDTO.getDescription().length() > 1000) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // 校验文件格式（可选），允许 jpg/jpeg/png 格式
+        if (file != null && file.getOriginalFilename() != null &&
+                !file.getOriginalFilename().isEmpty() &&
+                !file.getOriginalFilename().toLowerCase().matches(".*\\.(jpg|jpeg|png)$")) {
             return ResponseEntity.badRequest().body(null);
         }
 
